@@ -80,11 +80,11 @@ private struct PinnedImageView: View {
             .overlay(alignment: .topTrailing) {
                 if hovering {
                     HStack(spacing: 6) {
-                        Button(action: onCopy) { Image(systemName: "doc.on.doc") }
+                        Button { onCopy() } label: { Image(systemName: "doc.on.doc") }
                             .help("Copy")
                         Button(action: { opacity = opacity > 0.6 ? 0.45 : 1 }) { Image(systemName: "circle.lefthalf.filled") }
                             .help("Toggle transparency")
-                        Button(action: onClose) { Image(systemName: "xmark") }
+                        Button { onClose() } label: { Image(systemName: "xmark") }
                             .help("Close (Esc)")
                     }
                     .buttonStyle(.glass)
@@ -94,11 +94,11 @@ private struct PinnedImageView: View {
                 }
             }
             .onHover { inside in withAnimation(.easeOut(duration: 0.15)) { hovering = inside } }
-            .onTapGesture(count: 2, perform: onClose)
-            .onExitCommand(perform: onClose)
+            .onTapGesture(count: 2) { onClose() }
+            .onExitCommand { onClose() }
             .contextMenu {
-                Button("Copy", action: onCopy)
-                Button("Close", action: onClose)
+                Button("Copy") { onCopy() }
+                Button("Close") { onClose() }
             }
             .environment(\.colorScheme, .dark)
     }
@@ -246,7 +246,9 @@ private struct CapturePreviewView: View {
     }
 
     private func action(_ symbol: String, _ title: String, _ perform: @escaping @MainActor () -> Void) -> some View {
-        Button(action: perform) {
+        Button {
+            perform()
+        } label: {
             Label(title, systemImage: symbol)
                 .labelStyle(.iconOnly)
                 .font(.system(size: 14, weight: .semibold))

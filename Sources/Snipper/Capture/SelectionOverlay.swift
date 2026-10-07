@@ -770,7 +770,9 @@ struct ToolbarIconButton: View {
     @State private var hovering = false
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            action()
+        } label: {
             Image(systemName: symbol)
                 .font(.system(size: 14, weight: .semibold))
                 .frame(width: 34, height: 34)

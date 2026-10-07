@@ -115,7 +115,7 @@ struct AnnotationEditorView: View {
                 .buttonStyle(.glass)
             }
             Spacer()
-            Button("Cancel", role: .cancel, action: onClose)
+            Button("Cancel", role: .cancel) { onClose() }
                 .buttonStyle(.glass)
                 .keyboardShortcut(.cancelAction)
             Button("Save As…", systemImage: "square.and.arrow.down.on.square") {

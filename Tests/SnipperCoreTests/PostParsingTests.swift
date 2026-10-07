@@ -52,9 +52,9 @@ final class PostParsingTests: XCTestCase {
 
     func testPostTextCleaning() {
         let raw = "@bob @carol Look 👀 at this &amp; that https://t.co/abc https://t.co/media"
-        // Indices are code points: the emoji counts once.
+        // Indices are code points of the unescaped text: the emoji and "&" count once.
         let start = Array("@bob @carol ".unicodeScalars).count
-        let end = Array("@bob @carol Look 👀 at this &amp; that https://t.co/abc".unicodeScalars).count
+        let end = Array("@bob @carol Look 👀 at this & that https://t.co/abc".unicodeScalars).count
         let cleaned = PostText.clean(
             raw,
             displayRange: [start, end],

@@ -72,6 +72,10 @@ final class SearchTests: XCTestCase {
         let boosted = HybridRanker.rank(c, query: QueryParser.parse("grocery"), semantic: [snips[0].id: 0.5, snips[1].id: 0.45, snips[2].id: 0.4])
         XCTAssertEqual(boosted.first?.id, snips[1].id)
 
+        // Image / "more like this" queries: similarity without text, filters still apply.
+        let imageHits = HybridRanker.rank(c, query: QueryParser.parse("type:note type:screenshot"), semantic: semantic)
+        XCTAssertEqual(imageHits.map(\.id), [snips[2].id, snips[1].id])
+
         // Snips without vectors yet still surface through keywords.
         let partial = HybridRanker.rank(c, query: QueryParser.parse("revenue"), semantic: [snips[0].id: 0.3])
         XCTAssertTrue(partial.contains { $0.id == snips[2].id && $0.keyword > 0 })

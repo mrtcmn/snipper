@@ -109,6 +109,11 @@ final class ImportAndAPITests: XCTestCase {
         """#.write(to: data.appendingPathComponent("tweets.js"), atomically: true, encoding: .utf8)
         try "window.YTD.tweet_headers.part0 = []".write(to: data.appendingPathComponent("tweet-headers.js"), atomically: true, encoding: .utf8)
 
+        // A single file works too, picking up account.js next to it.
+        let single = try XArchiveImporter.importFile(data.appendingPathComponent("tweets.js"))
+        XCTAssertEqual(single.snips.first?.author?.handle, "me")
+        XCTAssertEqual(try XArchiveImporter.importFile(data.appendingPathComponent("like.js")).snips.count, 1)
+
         let outcome = try XArchiveImporter.importFolder(root)
         XCTAssertEqual(outcome.skipped, 1)
         let like = try XCTUnwrap(outcome.snips.first { $0.externalID == "x:111" })

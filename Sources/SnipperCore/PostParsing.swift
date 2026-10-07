@@ -14,6 +14,9 @@ public enum PostParseError: Error, Equatable, CustomStringConvertible {
 
 /// Turns raw post text into what X displays.
 public enum PostText {
+    /// The raw text is HTML-escaped while X computes indices on the unescaped text,
+    /// so entities are decoded before the display range is applied.
+    ///
     /// - Parameters:
     ///   - displayRange: `[start, end)` in Unicode code points; trims reply mentions and media links.
     ///   - urls: t.co link → expanded URL.
@@ -24,7 +27,7 @@ public enum PostText {
         urls: [(short: String, expanded: String)] = [],
         mediaURLs: [String] = []
     ) -> String {
-        var s = text
+        var s = HTMLText.decodeEntities(text)
         if let range = displayRange, range.count == 2 {
             let scalars = Array(s.unicodeScalars)
             let start = max(0, min(range[0], scalars.count))
@@ -39,7 +42,6 @@ public enum PostText {
         for url in mediaURLs where !url.isEmpty {
             s = s.replacingOccurrences(of: url, with: "")
         }
-        s = HTMLText.decodeEntities(s)
         s = HTMLText.replace(s, #"[ \t]+\n"#, "\n")
         return s.trimmingCharacters(in: .whitespacesAndNewlines)
     }

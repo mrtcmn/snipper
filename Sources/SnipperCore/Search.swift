@@ -202,7 +202,9 @@ public enum HybridRanker {
             let sim = semantic?[c.id]
             let score: Float
             if !query.hasFreeText {
-                score = 0
+                // Filter-only queries keep recency order; image and "more like this"
+                // queries pass similarity without text.
+                score = sim ?? 0
             } else if let semantic, !semantic.isEmpty {
                 if let sim {
                     score = semanticWeight * max(0, sim) + (1 - semanticWeight) * kw

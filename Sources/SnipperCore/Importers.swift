@@ -327,6 +327,43 @@ public enum XArchiveImporter {
         return outcome
     }
 
+    /// Imports a single archive file (`like.js`, `bookmarks.js`, `tweets.js`, …), using
+    /// `account.js` next to it, when present, as the author of your own posts.
+    public static func importFile(_ file: URL, now: Date = Date()) throws -> ImportOutcome {
+        guard let data = FileManager.default.contents(atPath: file.path) else {
+            throw ImportError.unreadable(file.lastPathComponent)
+        }
+        let entries = try parseYTD(data)
+        let name = file.deletingPathExtension().lastPathComponent.split(separator: "-").first.map(String.init) ?? ""
+        switch name {
+        case "like":
+            return likes(entries, now: now)
+        case "bookmark", "bookmarks":
+            return bookmarks(entries, now: now)
+        case "tweets", "tweet":
+            var account: SnipAuthor?
+            let accountFile = file.deletingLastPathComponent().appendingPathComponent("account.js")
+            if let accountData = FileManager.default.contents(atPath: accountFile.path),
+               let acc = (try? parseYTD(accountData))?.first?["account"] as? [String: Any] {
+                let handle = JSONValue.string(acc["username"]) ?? ""
+                account = SnipAuthor(name: JSONValue.string(acc["accountDisplayName"]) ?? handle, handle: handle)
+            }
+            return ownPosts(entries, account: account, now: now)
+        default:
+            // Unknown files: try them as generic post objects.
+            var outcome = ImportOutcome()
+            for entry in entries {
+                let inner = (entry.count == 1 ? entry.values.first as? [String: Any] : nil) ?? entry
+                if let snip = PostObjectMapper.snip(from: inner, source: "import:x-archive", now: now) {
+                    outcome.snips.append(snip)
+                } else {
+                    outcome.skipped += 1
+                }
+            }
+            return outcome
+        }
+    }
+
     static func likes(_ entries: [[String: Any]], now: Date) -> ImportOutcome {
         var outcome = ImportOutcome()
         for entry in entries {

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Snipper · EmbeddingGemma 2 runtime</title>
+</head>
+<body>
+<!--
+  Runs EmbeddingGemma 2 (onnx-community/embeddinggemma-2-ONNX) with Transformers.js inside
+  the app's hidden WKWebView, on WebGPU when available and WebAssembly otherwise.
+  Swift talks to it through window.snipperGemma (callAsyncJavaScript) and receives
+  progress through the "snipper" script message handler. Vectors are returned as
+  base64-encoded little-endian Float32 arrays.
+-->
+<script type="module">
+const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1/dist/transformers.min.js";
+const MODEL_ID = "onnx-community/embeddinggemma-2-ONNX";
+const DIMENSIONS = 768;
+// Tokens per batch. ONNX Runtime's WebGPU kernels hit a dispatch limit around 2,700.
+const BATCH_TOKEN_BUDGET = 2048;
+const MAX_TEXT_TOKENS = 2048;
+
+const bridge = window.webkit?.messageHandlers?.snipper;
+function post(message) {
+  if (bridge) {
+    try { bridge.postMessage(message); } catch {}
+  } else {
+    console.log("[snipper-gemma]", JSON.stringify(message));
+  }
+}
+
+let T = null;
+let processor = null;
+let model = null;
+let device = null;
+let dtype = null;
+let visionEnabled = false;
+let loading = null;
+
+// WebGPU sessions must not run concurrently.
+let queue = Promise.resolve();
+function serialized(task) {
+  const run = queue.then(task, task);
+  queue = run.catch(() => {});
+  return run;
+}
+
+async function detectDevice(preferGPU) {
+  if (!preferGPU || !("gpu" in navigator)) return "wasm";
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    return adapter ? "webgpu" : "wasm";
+  } catch {
+    return "wasm";
+  }
+}
+
+function toBase64(floats) {
+  const bytes = new Uint8Array(floats.buffer, floats.byteOffset, floats.byteLength);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
+function base64ToBlob(b64, type) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type });
+}
+
+function dispose(...values) {
+  for (const value of values) {
+    if (!value || typeof value !== "object") continue;
+    for (const item of Object.values(value)) {
+      try { item?.dispose?.(); } catch {}
+    }
+  }
+}
+
+function rowsToBase64(tensor) {
+  const [rows, dims] = tensor.dims;
+  const data = tensor.data;
+  const out = [];
+  for (let i = 0; i < rows; i++) out.push(toBase64(data.subarray(i * dims, (i + 1) * dims)));
+  return out;
+}
+
+async function init(options = {}) {
+  if (model) return status();
+  loading ??= (async () => {
+    post({ type: "progress", label: "Loading runtime", fraction: null });
+    T = await import(TRANSFORMERS_URL);
+    T.env.allowLocalModels = false;
+    T.env.useBrowserCache = true;
+
+    device = await detectDevice(options.preferGPU !== false);
+    // The quantized weights need WebGPU kernels: WebAssembly lacks GatherBlockQuantized,
+    // and the full-precision fallback would be a multi-gigabyte download.
+    if (device !== "webgpu" && !options.allowCPU) {
+      throw new Error("WEBGPU_UNAVAILABLE: WebGPU is not available here.");
+    }
+    dtype = options.dtype ?? (device === "webgpu" ? "q4" : "fp32");
+    visionEnabled = options.vision !== false;
+
+    // Load only the encoders we use: text always, vision for images. Audio stays unloaded.
+    const config = await T.AutoConfig.from_pretrained(MODEL_ID);
+    config.audio_config = null;
+    if (!visionEnabled) config.vision_config = null;
+
+    let lastReport = 0;
+    const onProgress = (p) => {
+      if (p.status !== "progress_total") return;
+      const now = performance.now();
+      if (now - lastReport < 120 && p.progress < 100) return;
+      lastReport = now;
+      post({ type: "progress", label: "Downloading EmbeddingGemma 2", fraction: (p.progress ?? 0) / 100, loaded: p.loaded ?? 0, total: p.total ?? 0 });
+    };
+
+    const [loadedProcessor, loadedModel] = await Promise.all([
+      T.AutoProcessor.from_pretrained(MODEL_ID),
+      T.AutoModel.from_pretrained(MODEL_ID, { config, device, dtype, progress_callback: onProgress }),
+    ]);
+    processor = loadedProcessor;
+    model = loadedModel;
+
+    post({ type: "progress", label: "Warming up", fraction: 1 });
+    await runTexts(["task: search result | query: warm up"]);
+    try { await navigator.storage?.persist?.(); } catch {}
+
+    post({ type: "ready", device, dtype, vision: visionEnabled });
+    return status();
+  })();
+  try {
+    return await loading;
+  } catch (error) {
+    loading = null;
+    model = null;
+    processor = null;
+    post({ type: "failed", message: String(error?.message ?? error) });
+    throw error;
+  }
+}
+
+function status() {
+  return { ready: !!model, device, dtype, vision: visionEnabled, dimensions: DIMENSIONS };
+}
+
+async function runTexts(texts) {
+  const inputs = await processor.tokenizer(texts, { padding: true, truncation: true, max_length: MAX_TEXT_TOKENS });
+  const output = await model(inputs);
+  try {
+    return rowsToBase64(output.sentence_embedding);
+  } finally {
+    dispose(output, inputs);
+  }
+}
+
+async function tokenLength(text) {
+  const encoded = await processor.tokenizer(text, { truncation: true, max_length: MAX_TEXT_TOKENS });
+  try {
+    return encoded.input_ids.dims.at(-1);
+  } finally {
+    dispose(encoded);
+  }
+}
+
+/** Embeds texts (already carrying their task prefix). Returns one base64 vector per text. */
+async function embedTexts(texts) {
+  await init();
+  return serialized(async () => {
+    const lengths = [];
+    for (const text of texts) lengths.push(await tokenLength(text));
+
+    // Group texts so each padded batch stays inside the token budget.
+    const results = new Array(texts.length);
+    let batch = [];
+    let longest = 0;
+    const flush = async () => {
+      if (!batch.length) return;
+      const vectors = await runTexts(batch.map((i) => texts[i]));
+      batch.forEach((index, j) => { results[index] = vectors[j]; });
+      batch = [];
+      longest = 0;
+    };
+    for (let i = 0; i < texts.length; i++) {
+      const next = Math.max(longest, lengths[i]);
+      if (batch.length && next * (batch.length + 1) > BATCH_TOKEN_BUDGET) await flush();
+      batch.push(i);
+      longest = Math.max(longest, lengths[i]);
+    }
+    await flush();
+    return results;
+  });
+}
+
+/**
+ * Embeds one input made of optional text and images (base64 JPEG/PNG).
+ * The text must contain one <|image|> placeholder per image; with no text the
+ * images alone are embedded. `budget` is the vision token budget per image (70–1120).
+ */
+async function embedMixed({ text = null, images = [], budget = 280 } = {}) {
+  await init();
+  if (images.length && !visionEnabled) throw new Error("The vision encoder is not loaded.");
+  return serialized(async () => {
+    const raw = [];
+    for (const b64 of images) raw.push(await T.RawImage.fromBlob(base64ToBlob(b64, "image/jpeg")));
+    processor.image_processor.max_soft_tokens = budget;
+    const inputs = await processor(text || null, raw.length ? [raw] : null);
+    const output = await model(inputs);
+    try {
+      return rowsToBase64(output.sentence_embedding)[0];
+    } finally {
+      dispose(output, inputs);
+    }
+  });
+}
+
+window.addEventListener("error", (event) => post({ type: "log", level: "error", message: String(event.message ?? event) }));
+window.addEventListener("unhandledrejection", (event) => post({ type: "log", level: "error", message: String(event.reason?.message ?? event.reason) }));
+
+window.snipperGemma = { init, status, embedTexts, embedMixed };
+post({ type: "boot", webgpu: "gpu" in navigator, secure: window.isSecureContext });
+</script>
+</body>
+</html>

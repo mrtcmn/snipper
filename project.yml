@@ -1,0 +1,37 @@
+# Optional Xcode project, generated with XcodeGen (brew install xcodegen; xcodegen).
+# scripts/build-app.sh builds the same app without Xcode.
+name: Snipper
+options:
+  bundleIdPrefix: dev.grasco
+  deploymentTarget:
+    macOS: "26.0"
+packages:
+  SnipperCore:
+    path: .
+targets:
+  Snipper:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/Snipper
+        excludes:
+          - "Resources/**"
+      - path: Sources/Snipper/Resources
+        buildPhase: resources
+      - path: Extension
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: SnipperCore
+        product: SnipperCore
+    settings:
+      base:
+        PRODUCT_NAME: Snipper
+        PRODUCT_BUNDLE_IDENTIFIER: dev.grasco.snipper
+        INFOPLIST_FILE: App/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: App/Snipper.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "5.0"
+        MACOSX_DEPLOYMENT_TARGET: "26.0"

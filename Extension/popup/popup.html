@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Snipper</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/></svg></span>
+    <div class="brand">
+      <strong>Snipper</strong><span class="light"> for Mac</span>
+      <small id="status">Connecting…</small>
+    </div>
+    <span id="dot" class="dot" title="Connection"></span>
+  </header>
+
+  <section class="actions">
+    <button data-action="save-active-page"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/></svg></span><span><b>Save this page</b><em>Title, preview image and link</em></span><kbd>⌥⇧S</kbd></button>
+    <button data-action="save-active-selection"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6H3M21 12H8M21 18H8M3 12v6"/></svg></span><span><b>Save selected text</b><em>Keeps the source link</em></span></button>
+    <button data-action="screenshot-active"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="8" width="10" height="8" rx="1.5"/></svg></span><span><b>Screenshot visible area</b><em>Searchable by what it shows</em></span><kbd>⌥⇧A</kbd></button>
+    <button data-action="import-bookmarks" class="feature"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span><span><b>Import X bookmarks</b><em>Scrolls through and saves them all</em></span></button>
+  </section>
+
+  <p id="message" class="message" hidden></p>
+
+  <footer>
+    <button id="open" class="primary">Open Snipper</button>
+    <details>
+      <summary>Settings</summary>
+      <label>App port <input id="port" type="number" min="1024" max="65535"></label>
+      <p class="hint">Must match Snipper › Settings › Browser.</p>
+    </details>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>

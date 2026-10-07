@@ -51,7 +51,7 @@ struct LibraryRootView: View {
                 SnipViewer(
                     snip: snip,
                     similarity: items.first { $0.id == id }?.similarity,
-                    position: index.map { ($0, list.count) },
+                    position: index.map { (index: $0, total: list.count) },
                     onClose: { close() },
                     onPrevious: { step(-1, in: list) },
                     onNext: { step(1, in: list) }

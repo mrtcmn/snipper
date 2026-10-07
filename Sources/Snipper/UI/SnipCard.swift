@@ -22,7 +22,7 @@ struct SnipCard: View {
 
     var body: some View {
         content
-            .frame(maxWidth: .infinity, maxHeight: style == .tile ? .infinity : nil, alignment: .topLeading)
+            .frame(maxWidth: .infinity, maxHeight: style == .tile ? CGFloat.infinity : nil, alignment: .topLeading)
             .background(GlassCardBackground(cornerRadius: radius, tint: Theme.tint(for: snip.kind), highlighted: hovering))
             .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
             .overlay(alignment: .bottomLeading) {

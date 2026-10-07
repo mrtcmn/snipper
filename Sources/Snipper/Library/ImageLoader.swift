@@ -105,8 +105,10 @@ final class ImageLoader {
         return await Self.fetch(url, session: session)
     }
 
-    /// GETs `url`, returning the body for 2xx responses.
+    /// GETs `url`, returning the body for 2xx responses. Only http(s): URLs can come from
+    /// the extension, and file URLs must never be read on its behalf.
     nonisolated static func fetch(_ url: URL, session: URLSession) async -> Data? {
+        guard url.scheme == "https" || url.scheme == "http" else { return nil }
         guard let result = try? await session.data(from: url) else { return nil }
         if let http = result.1 as? HTTPURLResponse, !(200..<300).contains(http.statusCode) { return nil }
         return result.0

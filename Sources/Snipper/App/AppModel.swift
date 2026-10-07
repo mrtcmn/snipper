@@ -40,6 +40,7 @@ final class AppModel {
     @ObservationIgnored private var statusItem: StatusItemController?
     @ObservationIgnored private let services = ServicesProvider()
     @ObservationIgnored private var started = false
+    @ObservationIgnored private var databaseError: String?
 
     private init() {
         let paths = AppPaths.standard()
@@ -53,6 +54,7 @@ final class AppModel {
             // Keep the app usable (in memory) and tell the user once the UI is up.
             logger.fault("Opening the database failed: \(String(describing: error), privacy: .public)")
             database = try! SnipDatabase(path: ":memory:")
+            databaseError = String(describing: error)
         }
         let library = LibraryStore(database: database, media: MediaStore(folder: paths.media))
         self.library = library
@@ -97,6 +99,9 @@ final class AppModel {
         search.refresh(debounce: 0)
         downloader.scan()
         showLibrary()
+        if databaseError != nil {
+            HUD.shared.error("Snipper couldn't open its library file, so changes won't be saved this session.")
+        }
 
         if settings.didOnboard {
             await index.configure()
@@ -246,6 +251,11 @@ final class AppModel {
 
     /// Saves a link, or the post it points to.
     func saveURL(_ url: URL, title: String?, source: String) async {
+        // Links can arrive from the URL scheme or drops; never fetch local files for them.
+        guard url.scheme == "https" || url.scheme == "http" else {
+            HUD.shared.error("Only web links can be saved.")
+            return
+        }
         if let reference = TweetURL.parse(url.absoluteString) {
             HUD.shared.show("Saving post…", symbol: "arrow.down.circle")
             do {

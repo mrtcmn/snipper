@@ -6,6 +6,9 @@
   if (window.__snipperHooked) return;
   window.__snipperHooked = true;
 
+  // Runs before X's redirect from /i/bookmarks to /i/history drops the hash; x.js reads this.
+  if (location.hash === "#snipper-import") sessionStorage.setItem("snipper-import", "1");
+
   const parse = window.__snipperTweetParse;
   if (!parse) return;
 
@@ -42,6 +45,16 @@
     }
   }
 
+  // X sends this mutation from the bookmark button, the share menu and the keyboard alike.
+  // Not kept for replay, so a reload doesn't save the post again.
+  function bookmarkCreated(url, body) {
+    if (parse.operationName(url) !== "CreateBookmark" || typeof body !== "string") return;
+    try {
+      const id = JSON.parse(body)?.variables?.tweet_id;
+      if (id) window.postMessage({ __snipper: "bookmark", id: String(id) }, window.location.origin);
+    } catch {}
+  }
+
   // XMLHttpRequest: X's web app loads its timelines this way.
   const xhrOpen = XMLHttpRequest.prototype.open;
   const xhrSend = XMLHttpRequest.prototype.send;
@@ -57,6 +70,7 @@
       this.addEventListener("load", () => {
         try {
           if (this.status < 200 || this.status >= 300) return;
+          bookmarkCreated(url, args[0]);
           let json = null;
           if (this.responseType === "" || this.responseType === "text") json = JSON.parse(this.responseText);
           else if (this.responseType === "json") json = this.response;
@@ -74,6 +88,8 @@
     try {
       const url = typeof input === "string" ? input : input?.url ?? String(input);
       if (GRAPHQL.test(url) && response.ok) {
+        // ponytail: reads init.body only; a Request object's body is not read.
+        bookmarkCreated(url, init?.body);
         response.clone().json().then((json) => publish(url, json)).catch(() => {});
       }
     } catch {}

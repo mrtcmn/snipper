@@ -67,8 +67,8 @@ final class CaptureCoordinator {
         if ScreenCapturePermission.isGranted { return true }
         if ScreenCapturePermission.request() { return true }
         let alert = NSAlert()
-        alert.messageText = "Allow Snipper to record the screen"
-        alert.informativeText = "Snipper needs Screen Recording access to take screenshots. Turn it on in System Settings › Privacy & Security › Screen & System Audio Recording, then try again."
+        alert.messageText = "Allow Stash to record the screen"
+        alert.informativeText = "Stash needs Screen Recording access to take screenshots. Turn it on in System Settings › Privacy & Security › Screen & System Audio Recording, then try again."
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Cancel")
         NSApp.activate()
@@ -159,7 +159,7 @@ final class CaptureCoordinator {
         if model.settings.showCapturePreview {
             model.capturePreview.show(image: image, snipID: snip.id)
         } else {
-            HUD.shared.show("Saved to Snipper", symbol: "checkmark.circle.fill")
+            HUD.shared.show("Saved to Stash", symbol: "checkmark.circle.fill")
         }
     }
 }

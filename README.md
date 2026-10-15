@@ -26,7 +26,7 @@ A native macOS 26 app with Liquid Glass, on-device <b>EmbeddingGemma 2</b> searc
 - Filters: `from:handle` · `tag:name` · `type:post|screenshot|note|link|image|clip` · `is:fav` · `"exact phrase"`.
 
 **Liquid Glass design**
-- An *atlas* field like the EmbeddingGemma demo: cards arranged in rings, best match in the center, shrinking toward the edges like a lens; pan, pinch and zoom. Or a masonry *grid*.
+- An *atlas* globe like the EmbeddingGemma 2 WebGPU demo: equal cards on a sphere that repeats in every direction, best match in the center; drag or scroll to pan, pinch or ⌘-scroll to zoom. Or a masonry *grid*.
 - Floating glass search bar with similarity readouts, glass chrome, a focused viewer, and a menu bar panel with every tool.
 
 ## Requirements
@@ -38,7 +38,7 @@ A native macOS 26 app with Liquid Glass, on-device <b>EmbeddingGemma 2</b> searc
 ## Build and run
 
 ```bash
-make run              # builds build/Snipper.app and opens it
+make run              # builds build/Stash.app and opens it
 # or
 scripts/build-app.sh  # release build, ad-hoc signed
 ```

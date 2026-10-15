@@ -14,7 +14,7 @@ final class LibraryWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Snipper"
+        window.title = "Stash"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.contentViewController = hosting
@@ -52,7 +52,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         super.init()
         if let button = item.button {
-            button.image = NSImage(systemSymbolName: "scissors", accessibilityDescription: "Snipper")
+            let icon = Bundle.main.image(forResource: "MenuBarIcon")
+                ?? NSImage(systemSymbolName: "scissors", accessibilityDescription: nil)
+            icon?.size = NSSize(width: 18, height: 18)
+            icon?.isTemplate = true
+            icon?.accessibilityDescription = "Stash"
+            button.image = icon
             button.target = self
             button.action = #selector(toggle(_:))
         }

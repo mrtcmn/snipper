@@ -13,8 +13,8 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 0) {
-                        Text("Welcome to ").headline(30, weight: .regular).foregroundStyle(Color(hex: 0xB2C2CE))
-                        Text("Snipper").headline(30, weight: .semibold).foregroundStyle(Theme.ink)
+                        Text("Welcome to ").headline(30, weight: .regular).foregroundStyle(Color(hex: 0xBDBDBD))
+                        Wordmark(height: 26).foregroundStyle(Theme.ink)
                     }
                     Text("Save posts, screenshots, notes and links — then find them by meaning, privately on your Mac.")
                         .font(.system(size: 14))
@@ -23,7 +23,7 @@ struct OnboardingView: View {
 
                 step(
                     number: 1,
-                    title: "Let Snipper capture the screen",
+                    title: "Let Stash capture the screen",
                     detail: "Needed for area, window and text (OCR) captures. Press ⌃⇧4 any time.",
                     done: screenAllowed
                 ) {
@@ -37,7 +37,7 @@ struct OnboardingView: View {
                 step(
                     number: 2,
                     title: "Add the browser extension",
-                    detail: "In Chrome, Arc, Brave or Edge open the extensions page, enable Developer mode, then Load unpacked → the Snipper extension folder. You get a Snip button on every post and one-click bookmark import.",
+                    detail: "In Chrome, Arc, Brave or Edge open the extensions page, enable Developer mode, then Load unpacked → the Stash extension folder. You get a Snip button on every post and one-click bookmark import.",
                     done: model.lastExtensionContact != nil
                 ) {
                     Button("Show Extension Folder") { model.revealExtensionFolder() }

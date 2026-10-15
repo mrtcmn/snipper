@@ -27,7 +27,7 @@ final class ImageLoader {
     private let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 20
-        config.httpAdditionalHeaders = ["User-Agent": "Snipper/1.0 (Macintosh)"]
+        config.httpAdditionalHeaders = ["User-Agent": "Stash/1.0 (Macintosh)"]
         return URLSession(configuration: config)
     }()
 
@@ -134,7 +134,13 @@ struct AsyncThumbnail: View {
 
     var body: some View {
         ZStack {
-            if let image {
+            if let image, contentMode == .fill {
+                // Take the size from the frame, not the image, so a fill never grows the card.
+                Color.clear
+                    .overlay { Image(nsImage: image).resizable().interpolation(.high).scaledToFill() }
+                    .clipped()
+                    .transition(.opacity)
+            } else if let image {
                 Image(nsImage: image)
                     .resizable()
                     .interpolation(.high)

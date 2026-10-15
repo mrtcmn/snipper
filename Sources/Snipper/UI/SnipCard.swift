@@ -3,7 +3,7 @@ import SwiftUI
 
 /// How a card is laid out.
 enum CardStyle {
-    /// Fixed square tile for the atlas field.
+    /// Fixed 4:3 tile (`SnipCard.tileSize`) for the globe.
     case tile
     /// Full-width card of natural height for the grid.
     case flow
@@ -59,6 +59,21 @@ struct SnipCard: View {
         }
     }
 
+    static let tileSize = CGSize(width: 320, height: 240)
+
+    /// Every image a `.tile` card shows, with the size it asks for. Loading these first lets the
+    /// globe render the card once, with its images, instead of with placeholders.
+    static func tileImages(_ snip: Snip) -> [(source: ImageSource, maxPixels: Int)] {
+        var out: [(source: ImageSource, maxPixels: Int)] = []
+        if let avatar = snip.author?.avatarURL { out.append((.remote(avatar), 84)) }
+        if let avatar = snip.tweet?.quoted?.author?.avatarURL { out.append((.remote(avatar), 48)) }
+        if let favicon = snip.link?.faviconURL { out.append((.remote(favicon), 48)) }
+        if let media = snip.primaryMedia, let source = ImageSource.of(media) {
+            out.append((source, snip.kind == .link ? 700 : 640))
+        }
+        return out
+    }
+
     /// Rough card height for balancing grid columns.
     static func estimatedHeight(_ snip: Snip, width: CGFloat) -> CGFloat {
         let charsPerLine = max(20, width / 7.4)
@@ -87,15 +102,15 @@ private struct PostCardContent: View {
     let style: CardStyle
 
     private var heroImage: SnipMedia? {
-        guard style == .tile, let media = snip.primaryMedia, snip.body.count < 140, snip.tweet?.quoted == nil else { return nil }
-        return media
+        // A 4:3 tile has no room for text plus a media strip, so any post with media shows it full-bleed.
+        style == .tile ? snip.primaryMedia : nil
     }
 
     var body: some View {
         if let hero = heroImage {
             ZStack(alignment: .bottomLeading) {
                 AsyncThumbnail(source: ImageSource.of(hero), maxPixels: 640)
-                LinearGradient(colors: [.clear, Color(hex: 0x09111A).opacity(0.86)], startPoint: .center, endPoint: .bottom)
+                LinearGradient(colors: [.clear, Color(hex: 0x0A0A0A).opacity(0.86)], startPoint: .center, endPoint: .bottom)
                 VStack(alignment: .leading, spacing: 8) {
                     header(onImage: true)
                     if !snip.body.isEmpty {
@@ -116,7 +131,7 @@ private struct PostCardContent: View {
                         .font(.system(size: style == .tile ? 13.5 : 14))
                         .lineSpacing(2)
                         .foregroundStyle(Theme.ink.opacity(0.94))
-                        .lineLimit(style == .tile ? (snip.primaryMedia == nil ? 8 : 3) : 14)
+                        .lineLimit(style == .tile ? (snip.tweet?.quoted == nil ? 7 : 3) : 14)
                         .fixedSize(horizontal: false, vertical: style == .flow)
                 }
                 if let media = snip.primaryMedia {
@@ -221,7 +236,7 @@ private struct ImageCardContent: View {
         case .tile:
             ZStack(alignment: .bottomLeading) {
                 AsyncThumbnail(source: snip.primaryMedia.flatMap(ImageSource.of), maxPixels: 640, placeholderTint: Theme.tint(for: snip.kind))
-                LinearGradient(colors: [.clear, Color(hex: 0x09111A).opacity(0.78)], startPoint: .center, endPoint: .bottom)
+                LinearGradient(colors: [.clear, Color(hex: 0x0A0A0A).opacity(0.78)], startPoint: .center, endPoint: .bottom)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(snip.displayTitle)
                         .font(.system(size: 13.5, weight: .semibold))
@@ -290,7 +305,7 @@ private struct NoteCardContent: View {
                 .tracking(-0.3)
                 .lineSpacing(3)
                 .foregroundStyle(Theme.ink)
-                .lineLimit(style == .tile ? 7 : 12)
+                .lineLimit(style == .tile ? 6 : 12)
             if style == .tile { Spacer(minLength: 0) }
             footer
         }
@@ -347,11 +362,12 @@ private struct LinkCardContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let media = snip.primaryMedia {
-                AsyncThumbnail(source: ImageSource.of(media), maxPixels: 700, placeholderTint: Theme.tint(for: .link))
-                    .frame(height: style == .tile ? 110 : nil)
-                    .aspectRatio(style == .flow ? 1.91 : nil, contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
+                let thumbnail = AsyncThumbnail(source: ImageSource.of(media), maxPixels: 700, placeholderTint: Theme.tint(for: .link))
+                Group {
+                    if style == .tile { thumbnail.frame(height: 110) } else { thumbnail.aspectRatio(1.91, contentMode: .fit) }
+                }
+                .frame(maxWidth: .infinity)
+                .clipped()
             }
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
@@ -372,7 +388,7 @@ private struct LinkCardContent: View {
                     .font(.system(size: 15, weight: .semibold))
                     .tracking(-0.2)
                     .foregroundStyle(Theme.ink)
-                    .lineLimit(style == .tile ? 3 : 3)
+                    .lineLimit(style == .tile ? 2 : 3)
                 if let summary = snip.link?.summary, !summary.isEmpty {
                     Text(summary)
                         .font(.system(size: 12))

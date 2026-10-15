@@ -75,7 +75,7 @@ struct SnipperCommands: Commands {
 
         CommandGroup(after: .pasteboard) {
             Divider()
-            Button("Save Clipboard to Snipper") { model.saveClipboard() }
+            Button("Save Clipboard to Stash") { model.saveClipboard() }
                 .keyboardShortcut("v", modifiers: [.command, .shift])
         }
 

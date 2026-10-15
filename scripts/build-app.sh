@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Builds Snipper.app with SwiftPM and the Xcode command line tools (macOS 26 SDK).
+# Builds Stash.app with SwiftPM and the Xcode command line tools (macOS 26 SDK).
 #
-#   scripts/build-app.sh                  # release build into build/Snipper.app
+#   scripts/build-app.sh                  # release build into build/Stash.app
 #   CONFIG=debug scripts/build-app.sh     # debug build
 #   SIGN_IDENTITY="Apple Development: …" scripts/build-app.sh
 #
@@ -12,7 +12,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 CONFIG="${CONFIG:-release}"
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
-APP="build/Snipper.app"
+APP="build/Stash.app"
 
 echo "▸ Building ($CONFIG)…"
 swift build -c "$CONFIG" --product Snipper

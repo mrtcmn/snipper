@@ -6,7 +6,7 @@ const OUTBOX_LIMIT = 500;
 
 class AppOfflineError extends Error {
   constructor() {
-    super("Snipper isn't running. Open the Snipper app on your Mac.");
+    super("Stash isn't running. Open the Stash app on your Mac.");
     this.name = "AppOfflineError";
   }
 }
@@ -34,7 +34,7 @@ async function callApp(path, body, { method = body ? "POST" : "GET", timeout = 2
     clearTimeout(timer);
   }
   const json = await response.json().catch(() => ({}));
-  if (!response.ok || json.ok === false) throw new Error(json.error || `Snipper answered ${response.status}`);
+  if (!response.ok || json.ok === false) throw new Error(json.error || `Stash answered ${response.status}`);
   return json;
 }
 
@@ -68,7 +68,7 @@ async function flushOutbox() {
 
 async function updateBadge() {
   const { outbox = [] } = await chrome.storage.local.get("outbox");
-  await chrome.action.setBadgeBackgroundColor({ color: "#14A7C7" });
+  await chrome.action.setBadgeBackgroundColor({ color: "#48484A" });
   await chrome.action.setBadgeText({ text: outbox.length ? String(Math.min(outbox.length, 999)) : "" });
 }
 
@@ -192,13 +192,13 @@ function showToast(text, kind) {
   host.id = id;
   host.style.cssText = "position:fixed;left:50%;bottom:32px;transform:translateX(-50%);z-index:2147483647;";
   const shadow = host.attachShadow({ mode: "closed" });
-  const colors = { ok: "#b7e8f2", warn: "#ffd68a", error: "#ff9ba7" };
+  const colors = { ok: "#e4e4e4", warn: "#ffd68a", error: "#ff9ba7" };
   shadow.innerHTML = `
     <style>
-      div{display:flex;align-items:center;gap:10px;padding:11px 16px 11px 12px;border-radius:16px;color:#eef5f9;
+      div{display:flex;align-items:center;gap:10px;padding:11px 16px 11px 12px;border-radius:16px;color:#f2f2f2;
         font:500 14px/1.3 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;letter-spacing:-.01em;white-space:nowrap;
-        background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.01)),rgba(10,20,33,.8);
-        border:1px solid rgba(212,228,244,.16);border-top-color:rgba(255,255,255,.26);
+        background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.01)),rgba(21,21,21,.8);
+        border:1px solid rgba(255,255,255,.16);border-top-color:rgba(255,255,255,.26);
         box-shadow:inset 0 1px rgba(255,255,255,.06),0 14px 40px rgba(0,0,0,.35);
         -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
         opacity:0;transform:translateY(10px);transition:opacity .22s ease,transform .28s cubic-bezier(.2,.8,.2,1)}
@@ -216,9 +216,9 @@ function showToast(text, kind) {
   }, kind === "error" ? 4000 : 2400);
 }
 
-function describe(result, noun = "Saved to Snipper") {
-  if (result?.queued) return ["Snipper isn't running — saved for later", "warn"];
-  if (result?.added === 0 && (result?.updated || result?.unchanged)) return ["Already in Snipper — updated", "ok"];
+function describe(result, noun = "Saved to Stash") {
+  if (result?.queued) return ["Stash isn't running — saved for later", "warn"];
+  if (result?.added === 0 && (result?.updated || result?.unchanged)) return ["Already in Stash — updated", "ok"];
   return [noun, "ok"];
 }
 
@@ -226,11 +226,11 @@ function describe(result, noun = "Saved to Snipper") {
 // Context menus and commands
 
 const MENUS = [
-  { id: "snipper-selection", title: "Save selection to Snipper", contexts: ["selection"] },
-  { id: "snipper-link", title: "Save link to Snipper", contexts: ["link"] },
-  { id: "snipper-image", title: "Save image to Snipper", contexts: ["image"] },
-  { id: "snipper-page", title: "Save page to Snipper", contexts: ["page"] },
-  { id: "snipper-screenshot", title: "Screenshot visible area to Snipper", contexts: ["page"] },
+  { id: "snipper-selection", title: "Save selection to Stash", contexts: ["selection"] },
+  { id: "snipper-link", title: "Save link to Stash", contexts: ["link"] },
+  { id: "snipper-image", title: "Save image to Stash", contexts: ["image"] },
+  { id: "snipper-page", title: "Save page to Stash", contexts: ["page"] },
+  { id: "snipper-screenshot", title: "Screenshot visible area to Stash", contexts: ["page"] },
 ];
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -253,27 +253,27 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const tabId = tab?.id;
   try {
     let item = null;
-    let label = "Saved to Snipper";
+    let label = "Saved to Stash";
     switch (info.menuItemId) {
       case "snipper-selection":
         item = await selectionItem(tab, info.selectionText);
-        label = "Selection saved to Snipper";
+        label = "Selection saved to Stash";
         break;
       case "snipper-link":
         item = { type: "link", url: info.linkUrl, title: info.linkText || info.selectionText || undefined };
-        label = "Link saved to Snipper";
+        label = "Link saved to Stash";
         break;
       case "snipper-image":
         item = { type: "image", srcUrl: info.srcUrl, dataUrl: await imageDataURL(info.srcUrl), url: info.pageUrl, title: tab?.title };
-        label = "Image saved to Snipper";
+        label = "Image saved to Stash";
         break;
       case "snipper-page":
         item = await pageItem(tab);
-        label = "Page saved to Snipper";
+        label = "Page saved to Stash";
         break;
       case "snipper-screenshot":
         item = await screenshotItem(tab);
-        label = "Screenshot saved to Snipper";
+        label = "Screenshot saved to Stash";
         break;
     }
     if (!item) return;
@@ -293,11 +293,11 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
       const page = await pageItem(tab);
       const item = page.selection ? { type: "selection", text: page.selection, url: page.url, title: page.title, siteName: page.siteName, favicon: page.favicon } : page;
       const result = await save([item], "shortcut", { queueIfOffline: true });
-      const [text, kind] = describe(result, page.selection ? "Selection saved to Snipper" : "Page saved to Snipper");
+      const [text, kind] = describe(result, page.selection ? "Selection saved to Stash" : "Page saved to Stash");
       await notify(tab.id, text, kind);
     } else if (command === "screenshot-tab") {
       const result = await save([await screenshotItem(tab)], "shortcut");
-      const [text, kind] = describe(result, "Screenshot saved to Snipper");
+      const [text, kind] = describe(result, "Screenshot saved to Stash");
       await notify(tab.id, text, kind);
     }
   } catch (error) {
@@ -314,7 +314,7 @@ async function activeTab() {
 }
 
 async function openBookmarksImport() {
-  const tabs = await chrome.tabs.query({ url: ["https://x.com/i/bookmarks*", "https://twitter.com/i/bookmarks*"] });
+  const tabs = await chrome.tabs.query({ url: ["https://x.com/i/bookmarks*", "https://twitter.com/i/bookmarks*", "https://x.com/i/history"] });
   if (tabs[0]) {
     await chrome.tabs.update(tabs[0].id, { active: true });
     await chrome.windows.update(tabs[0].windowId, { focused: true });
@@ -349,7 +349,7 @@ async function handle(message, sender) {
     case "save-active-page": {
       const tab = await activeTab();
       const result = await save([await pageItem(tab)], "popup", { queueIfOffline: true });
-      const [text, kind] = describe(result, "Page saved to Snipper");
+      const [text, kind] = describe(result, "Page saved to Stash");
       await notify(tab.id, text, kind);
       return result;
     }
@@ -358,14 +358,14 @@ async function handle(message, sender) {
       const item = await selectionItem(tab);
       if (!item) throw new Error("Select some text on the page first.");
       const result = await save([item], "popup", { queueIfOffline: true });
-      const [text, kind] = describe(result, "Selection saved to Snipper");
+      const [text, kind] = describe(result, "Selection saved to Stash");
       await notify(tab.id, text, kind);
       return result;
     }
     case "screenshot-active": {
       const tab = await activeTab();
       const result = await save([await screenshotItem(tab)], "popup");
-      const [text, kind] = describe(result, "Screenshot saved to Snipper");
+      const [text, kind] = describe(result, "Screenshot saved to Stash");
       await notify(tab.id, text, kind);
       return result;
     }

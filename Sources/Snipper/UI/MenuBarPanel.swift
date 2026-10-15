@@ -34,13 +34,15 @@ struct MenuBarPanel: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "scissors")
-                .font(.system(size: 15, weight: .semibold))
+            Image(nsImage: Bundle.main.image(forResource: "MenuBarIcon") ?? NSImage())
+                .renderingMode(.template)
+                .resizable()
+                .frame(width: 15, height: 15)
                 .foregroundStyle(Theme.accent)
                 .frame(width: 32, height: 32)
                 .glassEffect(.regular.tint(Theme.accent.opacity(0.2)), in: Circle())
             VStack(alignment: .leading, spacing: 1) {
-                Text("Snipper").headline(15, weight: .semibold)
+                Wordmark(height: 13)
                 Text(statusText)
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.inkSecondary)
@@ -185,7 +187,7 @@ struct MenuBarPanel: View {
                 .simultaneousGesture(TapGesture().onEnded { dismiss() })
             Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
                 .buttonStyle(.glass)
-                .help("Quit Snipper")
+                .help("Quit Stash")
         }
     }
 }

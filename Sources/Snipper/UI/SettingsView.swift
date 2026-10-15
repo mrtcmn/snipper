@@ -24,7 +24,7 @@ private struct GeneralSettings: View {
         @Bindable var settings = model.settings
         Form {
             Section {
-                Toggle("Open Snipper at login", isOn: $launchAtLogin)
+                Toggle("Open Stash at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, on in LoginItem.set(on) }
                 Toggle("Show in Dock", isOn: $settings.showInDock)
                     .onChange(of: settings.showInDock) { _, _ in model.applyDockPolicy() }
@@ -123,7 +123,7 @@ private struct ShortcutSettings: View {
                 }
             }
             Section("Services") {
-                Text("Select text, a link or an image in any app and choose Services › Save to Snipper. Assign it a key in System Settings › Keyboard › Keyboard Shortcuts › Services.")
+                Text("Select text, a link or an image in any app and choose Services › Save to Stash. Assign it a key in System Settings › Keyboard › Keyboard Shortcuts › Services.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -232,7 +232,7 @@ private struct BrowserSettings: View {
                 }
             }
             Section("Without the extension") {
-                Text("Press ⌃⇧X in any browser to save the current tab. Posts on X are saved with their text, images and author. The first time, macOS asks to let Snipper control the browser.")
+                Text("Press ⌃⇧X in any browser to save the current tab. Posts on X are saved with their text, images and author. The first time, macOS asks to let Stash control the browser.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                 Button("Import X Bookmarks…") { model.importXBookmarksInBrowser() }

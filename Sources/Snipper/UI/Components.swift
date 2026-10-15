@@ -8,7 +8,7 @@ struct AvatarView: View {
 
     var body: some View {
         ZStack {
-            Circle().fill(LinearGradient(colors: [Theme.accent.opacity(0.35), Color(hex: 0x2A4A6B)], startPoint: .topLeading, endPoint: .bottomTrailing))
+            Circle().fill(LinearGradient(colors: [Theme.accent.opacity(0.35), Color(hex: 0x3A3A3A)], startPoint: .topLeading, endPoint: .bottomTrailing))
             Text(initials)
                 .font(.system(size: size * 0.4, weight: .semibold))
                 .foregroundStyle(Theme.ink.opacity(0.9))
@@ -175,35 +175,30 @@ struct EmptyLibraryView: View {
     }
 }
 
-/// Slowly drifting light behind the field.
+/// Soft light behind the field. Static: an endless drift redrew three large blurs on every frame.
 struct AuroraBackground: View {
-    @State private var drift = false
-
     var body: some View {
         ZStack {
             Theme.fieldGradient
             Circle()
-                .fill(Color(hex: 0x1E5A8C).opacity(0.35))
+                .fill(Color(hex: 0x3A3A3C).opacity(0.35))
                 .frame(width: 720, height: 720)
                 .blur(radius: 140)
-                .offset(x: drift ? -260 : -120, y: drift ? -220 : -140)
+                .offset(x: -190, y: -180)
             Circle()
-                .fill(Color(hex: 0x2BB5B8).opacity(0.14))
+                .fill(Color(hex: 0x5A5A5C).opacity(0.14))
                 .frame(width: 560, height: 560)
                 .blur(radius: 150)
-                .offset(x: drift ? 340 : 220, y: drift ? 260 : 320)
+                .offset(x: 280, y: 290)
             Circle()
-                .fill(Color(hex: 0x6E5BD6).opacity(0.10))
+                .fill(Color(hex: 0x2C2C2E).opacity(0.10))
                 .frame(width: 480, height: 480)
                 .blur(radius: 160)
-                .offset(x: drift ? 120 : 260, y: drift ? -300 : -200)
+                .offset(x: 190, y: -250)
             // Darken toward the bottom so the search bar sits on calm ground.
             LinearGradient(stops: [.init(color: .clear, location: 0.7), .init(color: .black.opacity(0.35), location: 1)], startPoint: .top, endPoint: .bottom)
         }
         .ignoresSafeArea()
-        .onAppear {
-            withAnimation(.easeInOut(duration: 26).repeatForever(autoreverses: true)) { drift = true }
-        }
     }
 }
 
@@ -238,5 +233,24 @@ private struct Spinning: ViewModifier {
         content
             .rotationEffect(.degrees(on ? 360 : 0))
             .onAppear { withAnimation(.linear(duration: 1.1).repeatForever(autoreverses: false)) { on = true } }
+    }
+}
+
+/// The "STASH" wordmark from Resources, tinted like text.
+struct Wordmark: View {
+    var height: CGFloat
+    private static let image = Bundle.main.image(forResource: "Wordmark")
+
+    var body: some View {
+        if let image = Self.image {
+            Image(nsImage: image)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(height: height)
+                .accessibilityLabel("Stash")
+        } else {
+            Text("Stash").headline(height, weight: .semibold)
+        }
     }
 }

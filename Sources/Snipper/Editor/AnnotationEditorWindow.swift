@@ -68,7 +68,7 @@ final class AnnotationEditorController {
         panel.allowedContentTypes = [.png, .jpeg]
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd 'at' HH.mm.ss"
-        panel.nameFieldStringValue = "Snipper \(formatter.string(from: Date())).png"
+        panel.nameFieldStringValue = "Stash \(formatter.string(from: Date())).png"
         let write: (NSApplication.ModalResponse) -> Void = { response in
             guard response == .OK, let url = panel.url else { return }
             let data = url.pathExtension.lowercased() == "jpg" || url.pathExtension.lowercased() == "jpeg"

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Snipper</string>
+	<string>Stash</string>
 	<key>CFBundleExecutable</key>
 	<string>Snipper</string>
 	<key>CFBundleIconFile</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Snipper</string>
+	<string>Stash</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,7 +31,7 @@
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Snipper reads the address of your browser's current tab when you press “Snip browser tab”.</string>
+	<string>Stash reads the address of your browser's current tab when you press “Snip browser tab”.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -49,12 +49,12 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>Save to Snipper</string>
+				<string>Save to Stash</string>
 			</dict>
 			<key>NSMessage</key>
 			<string>saveToSnipper</string>
 			<key>NSPortName</key>
-			<string>Snipper</string>
+			<string>Stash</string>
 			<key>NSSendTypes</key>
 			<array>
 				<string>public.utf8-plain-text</string>

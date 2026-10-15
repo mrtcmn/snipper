@@ -66,7 +66,7 @@ final class AppModel {
         capturePreview = CapturePreviewController(model: self)
         quickNote = QuickNoteController(model: self)
         server = LocalServer { [weak self] request in
-            await self?.handleAPI(request) ?? .error(503, "Snipper is shutting down")
+            await self?.handleAPI(request) ?? .error(503, "Stash is shutting down")
         }
     }
 
@@ -100,7 +100,7 @@ final class AppModel {
         downloader.scan()
         showLibrary()
         if databaseError != nil {
-            HUD.shared.error("Snipper couldn't open its library file, so changes won't be saved this session.")
+            HUD.shared.error("Stash couldn't open its library file, so changes won't be saved this session.")
         }
 
         if settings.didOnboard {

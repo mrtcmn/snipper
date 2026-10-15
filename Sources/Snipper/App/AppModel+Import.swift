@@ -68,7 +68,7 @@ extension AppModel {
         case ("GET", "/api/status"):
             return reply(.json([
                 "ok": true,
-                "app": "Snipper",
+                "app": "Stash",
                 "version": AppResources.version,
                 "snips": library.snips.count,
                 "search": index.engineName,
@@ -125,7 +125,7 @@ extension AppModel {
         guard let url = URL(string: "https://x.com/i/bookmarks#snipper-import") else { return }
         NSWorkspace.shared.open(url)
         if lastExtensionContact == nil {
-            HUD.shared.show("Install the Snipper browser extension to import bookmarks", symbol: "puzzlepiece.extension", duration: 4)
+            HUD.shared.show("Install the Stash browser extension to import bookmarks", symbol: "puzzlepiece.extension", duration: 4)
         }
     }
 
@@ -255,7 +255,7 @@ extension AppModel {
         guard panel.runModal() == .OK, let base = panel.url else { return }
 
         let stamp = DateParsing.isoString(Date()).prefix(10)
-        let folder = base.appendingPathComponent("Snipper Export \(stamp)")
+        let folder = base.appendingPathComponent("Stash Export \(stamp)")
         let mediaStore = library.media
         Task {
             let count = await Task.detached(priority: .userInitiated) { () -> Int in
@@ -283,7 +283,7 @@ extension AppModel {
     func exportJSON(_ snips: [Snip]) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
-        panel.nameFieldStringValue = "Snipper Library.json"
+        panel.nameFieldStringValue = "Stash Library.json"
         NSApp.activate()
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {

@@ -31,15 +31,9 @@ struct TopBar: View {
     // MARK: Brand
 
     private var brand: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 0) {
-                Text("Snipper")
-                    .headline(20, weight: .semibold)
-                    .foregroundStyle(Theme.ink)
-                Text(" Library")
-                    .headline(20, weight: .regular)
-                    .foregroundStyle(Color(hex: 0xB2C2CE))
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Wordmark(height: 15)
+                .foregroundStyle(Theme.ink)
             HStack(spacing: 6) {
                 statusDot
                 Text(statusLine)
@@ -49,7 +43,9 @@ struct TopBar: View {
                     .lineLimit(1)
             }
         }
-        .shadow(color: .black.opacity(0.5), radius: 12, y: 2)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .glassEffect(.regular.tint(Theme.panel.opacity(0.35)), in: Capsule())
         .fixedSize()
     }
 
@@ -108,10 +104,13 @@ struct TopBar: View {
             }
             .padding(.horizontal, 11)
             .padding(.vertical, 6)
-            .foregroundStyle(selected ? Color.black.opacity(0.85) : Theme.ink.opacity(0.85))
+            .foregroundStyle(selected ? Theme.ink : Theme.ink.opacity(0.75))
             .background {
                 if selected {
-                    Capsule().fill(Theme.accent).matchedGeometryEffect(id: "filter", in: glass)
+                    Capsule()
+                        .fill(.clear)
+                        .glassEffect(.regular.tint(.white.opacity(0.14)).interactive(), in: Capsule())
+                        .matchedGeometryEffect(id: "filter", in: glass)
                 }
             }
             .contentShape(Capsule())
@@ -144,8 +143,12 @@ struct TopBar: View {
             .font(.system(size: 12, weight: .medium))
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .foregroundStyle(current == nil ? Theme.ink.opacity(0.85) : Color.black.opacity(0.85))
-            .background(Capsule().fill(current == nil ? Color.clear : Theme.accent))
+            .foregroundStyle(current == nil ? Theme.ink.opacity(0.75) : Theme.ink)
+            .background {
+                if current != nil {
+                    Capsule().fill(.clear).glassEffect(.regular.tint(.white.opacity(0.14)), in: Capsule())
+                }
+            }
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
@@ -213,10 +216,13 @@ struct TopBar: View {
                     Image(systemName: mode == .atlas ? "circle.hexagongrid" : "square.grid.2x2")
                         .font(.system(size: 13, weight: .semibold))
                         .frame(width: 34, height: 30)
-                        .foregroundStyle(model.settings.viewMode == mode ? Color.black.opacity(0.85) : Theme.ink)
+                        .foregroundStyle(model.settings.viewMode == mode ? Theme.ink : Theme.ink.opacity(0.7))
                         .background {
                             if model.settings.viewMode == mode {
-                                Capsule().fill(Theme.accent).matchedGeometryEffect(id: "mode", in: glass)
+                                Capsule()
+                                    .fill(.clear)
+                                    .glassEffect(.regular.tint(.white.opacity(0.14)).interactive(), in: Capsule())
+                                    .matchedGeometryEffect(id: "mode", in: glass)
                             }
                         }
                         .contentShape(Capsule())

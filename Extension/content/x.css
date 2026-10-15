@@ -36,8 +36,8 @@
 
 .snipper-btn:hover .snipper-btn-circle,
 .snipper-btn:focus-visible .snipper-btn-circle {
-  color: #14a7c7;
-  background: rgba(20, 167, 199, 0.12);
+  color: #8e8e93;
+  background: rgba(142, 142, 147, 0.12);
 }
 
 .snipper-btn:focus-visible {
@@ -45,12 +45,12 @@
 }
 
 .snipper-btn[data-saved="true"] {
-  color: #14a7c7;
+  color: #8e8e93;
 }
 
 .snipper-btn[data-saved="true"] .snipper-btn-circle {
-  background: rgba(20, 167, 199, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(20, 167, 199, 0.35);
+  background: rgba(142, 142, 147, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(142, 142, 147, 0.35);
 }
 
 .snipper-btn[data-busy="true"] .snipper-btn-circle {
@@ -84,11 +84,11 @@
   gap: 10px;
   padding: 11px 16px 11px 12px;
   border-radius: 16px;
-  color: #eef5f9;
+  color: #f2f2f2;
   font: 500 14px/1.3 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   letter-spacing: -0.01em;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.01)), rgba(10, 20, 33, 0.78);
-  border: 1px solid rgba(212, 228, 244, 0.16);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.01)), rgba(21, 21, 21, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-top-color: rgba(255, 255, 255, 0.26);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 14px 40px rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
@@ -111,8 +111,8 @@
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  color: #0a1421;
-  background: #b7e8f2;
+  color: #121212;
+  background: #e4e4e4;
 }
 
 .snipper-toast-icon svg {
@@ -128,8 +128,8 @@
   border: 0;
   border-radius: 999px;
   padding: 5px 10px;
-  color: #0a1421;
-  background: #b7e8f2;
+  color: #121212;
+  background: #e4e4e4;
   font: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -145,10 +145,10 @@
   z-index: 2147483645;
   padding: 16px;
   border-radius: 22px;
-  color: #eef5f9;
+  color: #f2f2f2;
   font: 400 14px/1.45 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)), rgba(8, 18, 30, 0.82);
-  border: 1px solid rgba(212, 228, 244, 0.16);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)), rgba(18, 18, 18, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-top-color: rgba(255, 255, 255, 0.28);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.07), 0 24px 60px rgba(0, 0, 0, 0.45);
   -webkit-backdrop-filter: blur(28px) saturate(1.35);
@@ -179,7 +179,7 @@
 .snipper-panel-head small {
   display: block;
   font-size: 11px;
-  color: #a2b4c2;
+  color: #ababab;
 }
 
 .snipper-logo {
@@ -188,8 +188,8 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  color: #b7e8f2;
-  background: linear-gradient(145deg, rgba(183, 232, 242, 0.22), rgba(183, 232, 242, 0.06));
+  color: #e4e4e4;
+  background: linear-gradient(145deg, rgba(228, 228, 228, 0.22), rgba(228, 228, 228, 0.06));
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.18);
 }
 
@@ -204,7 +204,7 @@
   height: 28px;
   border: 0;
   border-radius: 9px;
-  color: #b9c5d1;
+  color: #bdbdbd;
   background: transparent;
   font-size: 20px;
   line-height: 1;
@@ -218,7 +218,7 @@
 
 .snipper-panel p {
   margin: 0 0 12px;
-  color: #d4e0e9;
+  color: #d6d6d6;
   font-size: 13px;
 }
 
@@ -230,7 +230,7 @@
 }
 
 .snipper-panel .snipper-count span {
-  color: #a2b4c2;
+  color: #ababab;
   font-size: 12px;
 }
 
@@ -251,7 +251,7 @@
   width: 40%;
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, rgba(183, 232, 242, 0.2), #b7e8f2);
+  background: linear-gradient(90deg, rgba(228, 228, 228, 0.2), #e4e4e4);
   animation: snipper-slide 1.3s ease-in-out infinite;
 }
 
@@ -269,24 +269,24 @@
   flex: 0 0 auto;
   padding: 8px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(214, 239, 240, 0.25);
-  color: #e6f3f7;
-  background: rgba(212, 237, 242, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ececec;
+  background: rgba(255, 255, 255, 0.07);
   font: 500 13px/1 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   cursor: pointer;
   transition: background 0.16s ease;
 }
 
 .snipper-actions button:hover {
-  background: rgba(212, 237, 242, 0.16);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .snipper-actions .snipper-primary {
-  color: #0a1421;
-  background: #b7e8f2;
-  border-color: rgba(229, 255, 255, 0.6);
+  color: #121212;
+  background: #e4e4e4;
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .snipper-actions .snipper-primary:hover {
-  background: #cdf1f8;
+  background: #f2f2f2;
 }

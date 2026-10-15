@@ -1,22 +1,21 @@
 import SwiftUI
 import SnipperCore
 
-/// Visual language: a deep-blue night field with icy, glassy surfaces,
-/// after the "Embed Anything" EmbeddingGemma demo.
+/// Visual language: a near-black graphite field with neutral, glassy surfaces.
 enum Theme {
-    static let ink = Color(hex: 0xF2F5F8)
-    static let inkSecondary = Color(hex: 0xA2B4C2)
-    static let inkTertiary = Color(hex: 0x7F9BA9)
-    static let accent = Color(hex: 0xB7E8F2)
-    static let accentStrong = Color(hex: 0x8FD8EA)
+    static let ink = Color(hex: 0xF2F2F2)
+    static let inkSecondary = Color(hex: 0xABABAB)
+    static let inkTertiary = Color(hex: 0x8A8A8A)
+    static let accent = Color(hex: 0xE4E4E4)
+    static let accentStrong = Color(hex: 0xCFCFCF)
     static let danger = Color(hex: 0xFF9BA7)
 
-    static let fieldTop = Color(hex: 0x0A1C3D)
+    static let fieldTop = Color(hex: 0x1C1C1E)
     static let fieldBottom = Color(hex: 0x000000)
-    static let surface = Color(hex: 0x10151B)
-    static let panel = Color(hex: 0x0B1724)
+    static let surface = Color(hex: 0x151515)
+    static let panel = Color(hex: 0x121212)
 
-    /// The window background: navy at the top-left fading to black.
+    /// The window background: graphite at the top-left fading to black.
     static var fieldGradient: LinearGradient {
         LinearGradient(
             stops: [.init(color: fieldTop, location: 0), .init(color: fieldBottom, location: 0.74)],
@@ -30,12 +29,12 @@ enum Theme {
 
     static func tint(for kind: SnipKind) -> Color {
         switch kind {
-        case .tweet: Color(hex: 0x8ECBFF)
+        case .tweet: Color(hex: 0xC7C7CC)
         case .screenshot: Color(hex: 0x9FF0D4)
         case .note: Color(hex: 0xFFD68A)
         case .link: Color(hex: 0xC5B8FF)
         case .image: Color(hex: 0xFFB3C7)
-        case .text: Color(hex: 0xB7E8F2)
+        case .text: Color(hex: 0xC7C7CC)
         }
     }
 
@@ -101,7 +100,7 @@ struct GlassCardBackground: View {
             // Inner glow along the top-left edge, like light caught in glass.
             .overlay(
                 shape
-                    .stroke(Color(hex: 0xE3F3FF).opacity(0.22), lineWidth: 6)
+                    .stroke(Color(hex: 0xF2F2F2).opacity(0.22), lineWidth: 6)
                     .blur(radius: 6)
                     .mask(shape.fill(LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .center)))
             )

@@ -23,7 +23,7 @@ enum BrowserBridge {
             case .noBrowser:
                 "Bring a browser window to the front first."
             case .notAuthorized(let browser):
-                "Snipper isn't allowed to read \(browser)'s tabs. Enable it in System Settings › Privacy & Security › Automation."
+                "Stash isn't allowed to read \(browser)'s tabs. Enable it in System Settings › Privacy & Security › Automation."
             case .noWindow(let browser):
                 "\(browser) has no open window."
             case .script(let browser, let message):

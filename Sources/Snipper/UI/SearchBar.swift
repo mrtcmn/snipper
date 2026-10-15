@@ -42,11 +42,11 @@ struct SearchBar: View {
                     }
                     .font(.system(size: 15))
                 } else {
-                    TextField("", text: $search.text, prompt: Text(placeholder).foregroundStyle(Color(hex: 0x8D9CAA)))
+                    TextField("", text: $search.text, prompt: Text(placeholder).foregroundStyle(Color(hex: 0x9A9A9A)))
                         .textFieldStyle(.plain)
                         .font(.system(size: 16))
                         .tracking(-0.3)
-                        .foregroundStyle(Color(hex: 0xEEF5F9))
+                        .foregroundStyle(Color(hex: 0xF3F3F3))
                         .focused($focused)
                         .onSubmit { search.refresh(debounce: 0) }
                         .onKeyPress(.escape) {
@@ -67,7 +67,7 @@ struct SearchBar: View {
             }
             .padding(.horizontal, 10)
             .frame(height: 58)
-            .glassEffect(.regular.tint(Color(hex: 0x0A1421).opacity(0.55)).interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .glassEffect(.regular.tint(Color(hex: 0x0F0F0F).opacity(0.55)).interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .strokeBorder(Theme.accent.opacity(focused || dropTargeted ? 0.45 : 0), lineWidth: 1)
@@ -90,7 +90,7 @@ struct SearchBar: View {
         } else {
             Image(systemName: model.index.isReady ? "sparkle.magnifyingglass" : "magnifyingglass")
                 .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Color(hex: 0xD0DCE6))
+                .foregroundStyle(Color(hex: 0xDADADA))
         }
     }
 
@@ -126,7 +126,7 @@ struct SearchBar: View {
             }
         }
         .font(.system(size: 12))
-        .foregroundStyle(Color(hex: 0xD4E0E9).opacity(0.72))
+        .foregroundStyle(Color(hex: 0xDDDDDD).opacity(0.72))
         .shadow(color: .black.opacity(0.85), radius: 8, y: 1)
         .animation(.easeOut(duration: 0.2), value: search.isQueryActive)
     }
@@ -145,7 +145,7 @@ struct SearchBar: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(Color(hex: 0xD0DCE6))
+        .foregroundStyle(Color(hex: 0xDADADA))
         .help(help)
     }
 

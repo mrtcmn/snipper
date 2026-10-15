@@ -1,10 +1,10 @@
 :root {
   color-scheme: dark;
-  --ink: #f2f5f8;
-  --ink-2: #a2b4c2;
-  --ink-3: #7f9ba9;
-  --accent: #b7e8f2;
-  --line: rgba(212, 228, 244, 0.14);
+  --ink: #f2f2f2;
+  --ink-2: #ababab;
+  --ink-3: #8a8a8a;
+  --accent: #e4e4e4;
+  --line: rgba(255, 255, 255, 0.14);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,9 +15,9 @@ body {
   color: var(--ink);
   font: 400 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   background:
-    radial-gradient(120% 80% at 0% 0%, rgba(30, 90, 140, 0.55), transparent 60%),
-    radial-gradient(80% 60% at 100% 100%, rgba(43, 181, 184, 0.18), transparent 70%),
-    linear-gradient(135deg, #0a1c3d, #000 74%);
+    radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, 0.07), transparent 60%),
+    radial-gradient(80% 60% at 100% 100%, rgba(255, 255, 255, 0.03), transparent 70%),
+    linear-gradient(135deg, #1c1c1e, #000 74%);
 }
 
 header {
@@ -34,7 +34,7 @@ header {
   height: 36px;
   border-radius: 12px;
   color: var(--accent);
-  background: linear-gradient(145deg, rgba(183, 232, 242, 0.24), rgba(183, 232, 242, 0.05));
+  background: linear-gradient(145deg, rgba(228, 228, 228, 0.24), rgba(228, 228, 228, 0.05));
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -42,7 +42,7 @@ header {
 
 .brand { flex: 1; min-width: 0; }
 .brand strong { font-size: 17px; font-weight: 600; letter-spacing: -0.045em; }
-.brand .light { font-size: 17px; color: #b2c2ce; letter-spacing: -0.045em; }
+.brand .light { font-size: 17px; color: #b5b5b5; letter-spacing: -0.045em; }
 .brand small { display: block; font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .dot {
@@ -70,12 +70,12 @@ header {
   border-radius: 14px;
   border: 1px solid var(--line);
   border-top-color: rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02) 48%, rgba(255, 255, 255, 0.04)), rgba(16, 21, 27, 0.5);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02) 48%, rgba(255, 255, 255, 0.04)), rgba(21, 21, 21, 0.5);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 8px 22px rgba(0, 0, 0, 0.18);
   transition: background 0.16s, transform 0.12s, border-color 0.16s;
 }
 
-.actions button:hover { border-color: rgba(183, 232, 242, 0.35); background-color: rgba(30, 40, 52, 0.6); }
+.actions button:hover { border-color: rgba(228, 228, 228, 0.35); background-color: rgba(36, 36, 38, 0.6); }
 .actions button:active { transform: scale(0.985); }
 .actions button:disabled { opacity: 0.45; cursor: default; }
 
@@ -87,7 +87,7 @@ header {
   border-radius: 10px;
   color: var(--accent);
   font-size: 15px;
-  background: rgba(183, 232, 242, 0.1);
+  background: rgba(228, 228, 228, 0.1);
 }
 
 .actions b { display: block; font-weight: 600; font-size: 13px; letter-spacing: -0.01em; }
@@ -102,8 +102,8 @@ header {
   border: 1px solid var(--line);
 }
 
-.actions .feature { border-color: rgba(183, 232, 242, 0.28); }
-.actions .feature .icon { color: #0a1421; background: var(--accent); }
+.actions .feature { border-color: rgba(228, 228, 228, 0.28); }
+.actions .feature .icon { color: #121212; background: var(--accent); }
 
 .message {
   margin-top: 10px;
@@ -123,13 +123,13 @@ footer { margin-top: 12px; display: flex; align-items: flex-start; gap: 10px; }
   flex: 0 0 auto;
   padding: 9px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(229, 255, 255, 0.6);
-  color: #0a1421;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #121212;
   background: var(--accent);
   font: 600 13px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   cursor: pointer;
 }
-.primary:hover { background: #cdf1f8; }
+.primary:hover { background: #f2f2f2; }
 
 details { flex: 1; color: var(--ink-2); font-size: 12px; padding-top: 8px; text-align: right; }
 details summary { cursor: pointer; list-style: none; }

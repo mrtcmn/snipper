@@ -26,8 +26,7 @@ struct LibraryRootView: View {
                         onImport: { model.importFiles() }
                     )
                 } else if model.settings.viewMode == .atlas {
-                    AtlasField(items: items, isSearching: search.isQueryActive) { open($0) }
-                        .padding(.top, 54)
+                    GlobeField(items: items, isSearching: search.isQueryActive) { open($0) }
                 } else {
                     MasonryGrid(items: items, isSearching: search.isQueryActive) { open($0) }
                 }
@@ -37,6 +36,15 @@ struct LibraryRootView: View {
 
             VStack(spacing: 0) {
                 TopBar()
+                    // The globe runs under the bar; a scrim keeps the title readable over cards.
+                    .background(alignment: .top) {
+                        if model.settings.viewMode == .atlas {
+                            LinearGradient(stops: [.init(color: .black.opacity(0.6), location: 0), .init(color: .black.opacity(0.3), location: 0.5), .init(color: .clear, location: 1)], startPoint: .top, endPoint: .bottom)
+                                .frame(height: 160)
+                                .ignoresSafeArea()
+                                .allowsHitTesting(false)
+                        }
+                    }
                 Spacer()
                 SearchBar()
                     .padding(.horizontal, 20)
@@ -161,7 +169,7 @@ private final class DropCollector: @unchecked Sendable {
 private struct DropOverlay: View {
     var body: some View {
         ZStack {
-            Color(hex: 0x04101B).opacity(0.78)
+            Color(hex: 0x060606).opacity(0.78)
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .strokeBorder(Theme.accent.opacity(0.5), style: StrokeStyle(lineWidth: 1.5, dash: [10, 8]))
                 .padding(26)

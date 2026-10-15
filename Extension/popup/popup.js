@@ -26,8 +26,8 @@ async function refresh() {
     statusEl.textContent = `Connected · ${count} snips · ${status.semantic ? status.search : "keyword search"}`;
   } else {
     dot.className = "dot off";
-    statusEl.textContent = status.offline ? "Snipper isn't running" : status.error || "Not connected";
-    show("Open the Snipper app on your Mac. Saves made now are queued and sent when it starts.", "");
+    statusEl.textContent = status.offline ? "Stash isn't running" : status.error || "Not connected";
+    show("Open the Stash app on your Mac. Saves made now are queued and sent when it starts.", "");
   }
 }
 
@@ -43,10 +43,10 @@ document.querySelectorAll("[data-action]").forEach((button) => {
       return;
     }
     if (result.ok) {
-      show(result.updated || result.unchanged ? "Already in Snipper — updated." : "Saved to Snipper.", "ok");
+      show(result.updated || result.unchanged ? "Already in Stash — updated." : "Saved to Stash.", "ok");
       setTimeout(() => window.close(), 700);
     } else if (result.queued) {
-      show("Snipper isn't running — saved for later.", "");
+      show("Stash isn't running — saved for later.", "");
     } else {
       show(result.error || "Something went wrong.", "error");
     }

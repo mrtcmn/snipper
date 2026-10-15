@@ -22,7 +22,7 @@
         });
       } catch (error) {
         // The extension was reloaded; this page's script is orphaned.
-        resolve({ ok: false, error: "Reload the page to reconnect Snipper." });
+        resolve({ ok: false, error: "Reload the page to reconnect Stash." });
       }
     });
   }
@@ -30,6 +30,10 @@
   window.addEventListener("message", (event) => {
     if (event.source !== window || event.origin !== window.location.origin) return;
     const data = event.data;
+    if (data?.__snipper === "bookmark" && typeof data.id === "string") {
+      saveBookmark(data.id);
+      return;
+    }
     if (!data || data.__snipper !== "graphql" || !Array.isArray(data.tweets)) return;
     for (const post of data.tweets) {
       if (post && post.id) cache.set(post.id, post);
@@ -137,8 +141,8 @@
     button.type = "button";
     button.className = "snipper-btn";
     button.dataset.snipperId = id;
-    button.setAttribute("aria-label", "Save to Snipper");
-    button.title = "Save to Snipper";
+    button.setAttribute("aria-label", "Save to Stash");
+    button.title = "Save to Stash";
     button.innerHTML = `<span class="snipper-btn-circle">${ICON}</span>`;
     button.addEventListener("click", (event) => {
       event.preventDefault();
@@ -159,7 +163,7 @@
 
   function markSaved(button, isSaved) {
     button.dataset.saved = isSaved ? "true" : "false";
-    button.title = isSaved ? "Saved in Snipper — click to remove" : "Save to Snipper";
+    button.title = isSaved ? "Saved in Stash — click to remove" : "Save to Stash";
     button.setAttribute("aria-label", button.title);
   }
 
@@ -177,7 +181,7 @@
         if (!result.ok) throw result;
         saved.delete(id);
         buttonsFor(id).forEach((b) => markSaved(b, false));
-        toast("Removed from Snipper");
+        toast("Removed from Stash");
       } else {
         const post = postFor(article);
         if (!post) throw { error: "Couldn't read this post." };
@@ -191,13 +195,28 @@
           b.classList.add("snipper-pop");
         });
         const who = post.author?.handle ? ` by @${post.author.handle}` : "";
-        toast(result.queued ? "Snipper isn't running — saved for later" : `Saved post${who}`, result.queued ? "warn" : "ok");
+        toast(result.queued ? "Stash isn't running — saved for later" : `Saved post${who}`, result.queued ? "warn" : "ok");
       }
     } catch (failure) {
-      toast(failure?.error || "Couldn't reach Snipper", "error");
+      toast(failure?.error || "Couldn't reach Stash", "error");
     } finally {
       delete button.dataset.busy;
     }
+  }
+
+  /** Saves a post the user just bookmarked on X. */
+  async function saveBookmark(id) {
+    const article = document.querySelector(`article[data-snipper="${CSS.escape(id)}"]`);
+    const post = cache.get(id) || (article && postFromDOM(article, id));
+    if (!post) return;
+    const result = await send({ type: "save", source: "x-bookmarks", items: [{ type: "tweet", tweet: post }], queueIfOffline: true });
+    if (!result.ok && !result.queued) {
+      toast(result.error || "Couldn't reach Stash", "error");
+      return;
+    }
+    saved.add(id);
+    buttonsFor(id).forEach((b) => markSaved(b, true));
+    toast(result.queued ? "Stash isn't running — saved for later" : "Bookmark saved to Stash", result.queued ? "warn" : "ok");
   }
 
   // Ask the app which visible posts are already saved, in batches.
@@ -274,6 +293,8 @@
   // ---------------------------------------------------------------------------
   // Bookmark import
 
+  // Bookmarks list newest first, so after one full scan an import can stop at this many known posts in a row.
+  const KNOWN_STREAK = 30;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const escapeHTML = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
@@ -287,9 +308,13 @@
     updated: 0,
     message: "",
     onBookmarks: false,
+    scanned: false, // a full scan reached the end once
+    incremental: false,
+    knownStreak: 0,
 
     isBookmarksPage() {
-      return /^\/i\/bookmarks(\/|$)/.test(location.pathname);
+      // X redirects /i/bookmarks to /i/history, whose default tab is Bookmarks.
+      return /^\/i\/(bookmarks(\/|$)|history\/?$)/.test(location.pathname);
     },
 
     watchRoute() {
@@ -298,8 +323,11 @@
       this.onBookmarks = here;
       if (here) {
         this.showPanel();
-        if (location.hash === "#snipper-import") {
-          history.replaceState(null, "", location.pathname + location.search);
+        // x-main.js keeps the request in sessionStorage because X's redirect drops the hash.
+        const requested = location.hash === "#snipper-import" || sessionStorage.getItem("snipper-import");
+        sessionStorage.removeItem("snipper-import");
+        if (requested) {
+          if (location.hash) history.replaceState(null, "", location.pathname + location.search);
           setTimeout(() => this.start(), 1200);
         }
       } else if (this.state !== "running") {
@@ -311,7 +339,7 @@
       if (this.state === "running" && post && post.id) this.collected.set(post.id, post);
     },
 
-    async start() {
+    async start(full = false) {
       if (this.state === "running") return;
       if (!this.isBookmarksPage()) {
         location.href = "https://x.com/i/bookmarks#snipper-import";
@@ -320,7 +348,7 @@
       const status = await send({ type: "status" });
       if (!status.ok) {
         this.state = "error";
-        this.message = "Snipper isn't running. Open the app, then try again.";
+        this.message = "Stash isn't running. Open the app, then try again.";
         this.render();
         return;
       }
@@ -330,6 +358,8 @@
       this.sent = new Set();
       this.added = 0;
       this.updated = 0;
+      this.incremental = this.scanned && !full;
+      this.knownStreak = 0;
       // Bookmarks the page already loaded before we started.
       for (const id of bookmarkIds) if (cache.has(id)) this.collected.set(id, cache.get(id));
       this.render();
@@ -356,8 +386,12 @@
       }
       for (let i = 0; i < pending.length; i += 40) {
         const batch = pending.slice(i, i + 40);
+        if (this.incremental) {
+          const known = new Set((await send({ type: "exists", ids: batch.map((p) => p.id) })).saved || []);
+          for (const p of batch) this.knownStreak = known.has(p.id) ? this.knownStreak + 1 : 0;
+        }
         const result = await send({ type: "save", source: "x-bookmarks", items: batch.map((tweet) => ({ type: "tweet", tweet })) });
-        if (!result.ok) throw new Error(result.error || "Couldn't reach Snipper");
+        if (!result.ok) throw new Error(result.error || "Couldn't reach Stash");
         batch.forEach((p) => {
           this.sent.add(p.id);
           saved.add(p.id);
@@ -373,6 +407,7 @@
       let idleRounds = 0;
       let lastSize = -1;
       let lastReport = 0;
+      let reachedEnd = false;
       try {
         window.scrollTo({ top: 0 });
         await sleep(900);
@@ -386,13 +421,21 @@
             lastReport = Date.now();
             send({ type: "progress", count: this.sent.size });
           }
+          if (this.incremental && this.knownStreak >= KNOWN_STREAK) break;
           const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 300;
-          if (idleRounds >= (atBottom ? 7 : 16)) break;
+          if (idleRounds >= (atBottom ? 7 : 16)) {
+            reachedEnd = atBottom;
+            break;
+          }
           window.scrollBy({ top: Math.round(window.innerHeight * 0.85), behavior: "instant" });
           await sleep(650 + Math.random() * 450);
         }
         this.scrapeDOM();
         await this.flush(true);
+        if (reachedEnd && this.state === "running" && !this.scanned) {
+          this.scanned = true;
+          chrome.storage.local.set({ bookmarksScanned: true });
+        }
         this.state = "done";
         this.message = `Saved ${this.sent.size.toLocaleString()} bookmarks${this.added ? ` · ${this.added.toLocaleString()} new` : ""}.`;
         send({ type: "progress", done: true, count: this.sent.size });
@@ -426,23 +469,26 @@
       const found = this.collected.size + this.domOnly.size;
       let body = "";
       let actions = "";
-      if (this.state === "idle") {
-        body = `<p>Save every bookmark to Snipper on your Mac, with full text and images, ready for semantic search.</p>`;
+      if (this.state === "idle" && this.scanned) {
+        body = `<p>Save bookmarks added since the last import. Stash stops when it reaches posts it already has.</p>`;
+        actions = `<button class="snipper-primary" data-act="start">Import new bookmarks</button><button data-act="full">Rescan all</button>`;
+      } else if (this.state === "idle") {
+        body = `<p>Save every bookmark to Stash on your Mac, with full text and images, ready for semantic search.</p>`;
         actions = `<button class="snipper-primary" data-act="start">Import all bookmarks</button>`;
       } else if (this.state === "running" || this.state === "stopping") {
         body = `<p class="snipper-count"><strong>${count.toLocaleString()}</strong> saved <span>· ${found.toLocaleString()} found · scrolling…</span></p><div class="snipper-bar"><i></i></div>`;
         actions = `<button data-act="stop">${this.state === "stopping" ? "Stopping…" : "Stop"}</button>`;
       } else if (this.state === "done") {
         body = `<p>${escapeHTML(this.message)}</p>`;
-        actions = `<button class="snipper-primary" data-act="open">Open Snipper</button><button data-act="start">Run again</button>`;
+        actions = `<button class="snipper-primary" data-act="open">Open Stash</button><button data-act="start">Run again</button>`;
       } else {
         body = `<p class="snipper-error">${escapeHTML(this.message)}</p>`;
-        actions = `<button class="snipper-primary" data-act="start">Try again</button><button data-act="launch">Open Snipper</button>`;
+        actions = `<button class="snipper-primary" data-act="start">Try again</button><button data-act="launch">Open Stash</button>`;
       }
       this.panel.innerHTML = `
         <div class="snipper-panel-head">
           <span class="snipper-logo">${ICON}</span>
-          <div><strong>Snipper</strong><small>Bookmarks import</small></div>
+          <div><strong>Stash</strong><small>Bookmarks import</small></div>
           <button class="snipper-close" data-act="close" aria-label="Close">×</button>
         </div>
         ${body}
@@ -451,6 +497,7 @@
         el.addEventListener("click", () => {
           const act = el.dataset.act;
           if (act === "start") this.start();
+          else if (act === "full") this.start(true);
           else if (act === "stop") this.stop();
           else if (act === "close") {
             if (this.state === "running") this.stop();
@@ -473,4 +520,8 @@
   });
 
   importer.watchRoute();
+  chrome.storage.local.get({ bookmarksScanned: false }).then(({ bookmarksScanned }) => {
+    importer.scanned = bookmarksScanned;
+    importer.render();
+  });
 })();

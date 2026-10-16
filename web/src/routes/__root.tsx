@@ -2,8 +2,8 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 
 import appCss from '../styles.css?url'
 
-// TODO(owner): set to the production domain. og:image and canonical need an absolute URL.
-const SITE = 'https://stash.app'
+// og:image and canonical need an absolute URL.
+const SITE = 'https://stash.grasco.dev'
 const TITLE = 'Stash — Save anything. Find it by meaning.'
 const DESCRIPTION = 'Every post, page and screenshot you keep, in one library on your Mac. Search by meaning, on-device.'
 

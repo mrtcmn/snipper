@@ -31,51 +31,19 @@ struct TopBar: View {
     // MARK: Brand
 
     private var brand: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .center, spacing: 10) {
             Wordmark(height: 15)
                 .foregroundStyle(Theme.ink)
-            HStack(spacing: 6) {
-                statusDot
-                Text(statusLine)
-                    .font(.system(size: 11))
-                    .tracking(0.15)
-                    .foregroundStyle(Theme.inkSecondary)
-                    .lineLimit(1)
-            }
+            Text("\(model.library.snips.count.formatted()) stashed")
+                .font(.system(size: 13, weight: .medium).monospacedDigit())
+                .foregroundStyle(Theme.inkSecondary)
+                .contentTransition(.numericText())
+                .help("Snips in your library")
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, 11)
         .glassEffect(.regular.tint(Theme.panel.opacity(0.35)), in: Capsule())
         .fixedSize()
-    }
-
-    private var statusLine: String {
-        let count = model.library.snips.count
-        let snips = "\(count.formatted()) snip\(count == 1 ? "" : "s")"
-        switch model.index.state {
-        case .ready:
-            return "\(snips) · \(model.index.engineName)"
-        case .preparing(let label, let progress):
-            return "\(snips) · \(label)\(progress.map { " \(Int($0 * 100))%" } ?? "")"
-        case .failed:
-            return "\(snips) · keyword search"
-        case .off:
-            return snips
-        }
-    }
-
-    @ViewBuilder
-    private var statusDot: some View {
-        switch model.index.state {
-        case .ready:
-            Circle().fill(Color(hex: 0x7EE0B5)).frame(width: 6, height: 6)
-        case .preparing(_, let progress):
-            ProgressRing(progress: progress, size: 9)
-        case .failed:
-            Circle().fill(Theme.danger).frame(width: 6, height: 6)
-        case .off:
-            Circle().fill(Theme.inkTertiary).frame(width: 6, height: 6)
-        }
     }
 
     // MARK: Filters

@@ -1,0 +1,66 @@
+name: Release
+
+# Push a tag like v1.2.0 to publish a GitHub release with Stash.zip and the extension zip.
+#
+# Optional secrets. Without them the app is ad-hoc signed and Gatekeeper blocks the first launch.
+#   MACOS_CERT_P12        base64 of a "Developer ID Application" .p12
+#   MACOS_CERT_PASSWORD   password of that .p12
+#   APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD   for notarization (app-specific password)
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    env:
+      MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+      MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: swift test
+
+      - name: Import signing certificate
+        if: env.MACOS_CERT_P12 != ''
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          echo "$MACOS_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p ci "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p ci "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k ci "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN" | grep -o '"Developer ID Application[^"]*"' | head -1 | tr -d '"')
+          echo "SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: VERSION="${GITHUB_REF_NAME#v}" scripts/build-app.sh
+
+      - name: Notarize
+        if: env.MACOS_CERT_P12 != '' && env.APPLE_ID != ''
+        run: |
+          ditto -c -k --keepParent build/Stash.app build/notarize.zip
+          xcrun notarytool submit build/notarize.zip --wait \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+          xcrun stapler staple build/Stash.app
+
+      - name: Package
+        run: |
+          ditto -c -k --keepParent build/Stash.app build/Stash.zip
+          make extension-zip
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" build/Stash.zip Extension/stash-extension.zip \
+            --title "Stash $GITHUB_REF_NAME" --generate-notes

@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:snipper}",
+            "name": "Debug Snipper",
+            "target": "Snipper",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Snipper"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:snipper}",
+            "name": "Release Snipper",
+            "target": "Snipper",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Snipper"
+        }
+    ]
+}

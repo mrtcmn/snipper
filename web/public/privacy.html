@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stash Privacy Policy</title>
+<style>
+  :root { --bg: #ffffff; --ink: #1c1c1e; --muted: #6e6e73; --line: #e5e5ea; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0a0a0a; --ink: #f2f2f2; --muted: #a1a1a6; --line: #2c2c2e; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 48px 16px 80px; }
+  h1 { font-size: 32px; margin: 0 0 4px; letter-spacing: -0.5px; }
+  h2 { font-size: 20px; margin: 36px 0 8px; }
+  p, li { color: var(--ink); }
+  .muted { color: var(--muted); }
+  ul { padding-left: 20px; }
+  code { font-size: 14px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Stash Privacy Policy</h1>
+  <p class="muted">Effective October 15, 2026. Applies to the Stash Mac app and the "Stash — Save to Mac" browser extension.</p>
+
+  <h2>Summary</h2>
+  <p>Stash keeps everything you save on your own Mac. We do not run a server that receives your data, we do not have accounts, and we do not use analytics, ads or tracking. We never sell or share your data.</p>
+
+  <h2>What the extension handles</h2>
+  <p>The extension acts only when you use it: when you click its button, press its shortcut, choose a right-click menu item, click the "Save to Stash" button on a post, bookmark a post on X, or start a bookmarks import. It then reads:</p>
+  <ul>
+    <li><strong>Website content</strong> you choose to save: the page address and title, selected text, images, and for posts on X the text, images, links and author.</li>
+    <li>A screenshot of the visible part of the tab, only when you ask for one.</li>
+  </ul>
+  <p>The extension sends this content to the Stash app on your own Mac at <code>http://127.0.0.1</code>. It does not send it anywhere else. If the app is closed, the extension keeps the save in the browser's local extension storage and delivers it when the app starts.</p>
+  <p>The extension also stores, in local extension storage, the port of the Stash app and whether your X bookmarks were imported before. This data never leaves your browser.</p>
+  <p>The extension does not read pages you do not act on, does not record your browsing history, and does not collect passwords, payment details, messages or location.</p>
+
+  <h2>What the Mac app stores</h2>
+  <p>The app stores your saved items, images, notes and search index in <code>~/Library/Application Support/Snipper</code> on your Mac. Search, text recognition in screenshots and the AI model run on your Mac. Your saved content is not uploaded for processing.</p>
+
+  <h2>Network requests the app makes</h2>
+  <ul>
+    <li>It downloads the open EmbeddingGemma 2 search model from Hugging Face and the Transformers.js library from jsDelivr, once, and caches them on your Mac. These requests contain no saved content.</li>
+    <li>It downloads images and link previews for items you saved, directly from the websites they come from.</li>
+  </ul>
+  <p>Those websites receive the normal information of any web request, such as your IP address. Their own privacy policies apply.</p>
+
+  <h2>Your control</h2>
+  <p>You can delete any item in the app. To remove everything, quit Stash and delete the folder above. Removing the extension deletes its local storage.</p>
+
+  <h2>Children</h2>
+  <p>Stash is not directed at children under 13 and does not knowingly collect their data.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, we update this page and its effective date.</p>
+
+  <hr>
+  <p class="muted">Questions: <a href="mailto:murat@grasco.dev">murat@grasco.dev</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+
+body {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #fbfbfa;
+}
+
+@font-face {
+  font-family: 'Stellost';
+  src: url('/fonts/stellost-webfont.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* Self-hosted from Google Fonts (latin subset, OFL) so the hero does not wait on a third-party stylesheet. */
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/instrument-serif-italic-latin.woff2') format('woff2');
+  font-display: swap;
+}

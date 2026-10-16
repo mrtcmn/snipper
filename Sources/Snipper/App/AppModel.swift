@@ -96,6 +96,7 @@ final class AppModel {
         }
 
         await library.load()
+        Analytics.capture("app_opened", ["snip_count": library.snips.count])
         search.refresh(debounce: 0)
         downloader.scan()
         showLibrary()
@@ -113,7 +114,11 @@ final class AppModel {
     private func libraryDidChange(_ change: LibraryChange) {
         index.libraryDidChange(change)
         search.libraryChanged()
-        if case .added(let ids) = change { downloader.enqueue(ids) }
+        if case .added(let ids) = change {
+            downloader.enqueue(ids)
+            let kinds = Set(ids.compactMap { library.snip($0)?.kind.rawValue })
+            Analytics.capture("snips_added", ["count": ids.count, "kinds": kinds.sorted()])
+        }
         if case .removed(let ids) = change, let viewerID, ids.contains(viewerID) { self.viewerID = nil }
     }
 
@@ -164,6 +169,7 @@ final class AppModel {
     // MARK: Shortcut actions
 
     func perform(_ action: HotKeyAction) {
+        Analytics.capture("action_used", ["action": action.rawValue])
         switch action {
         case .captureRegion: capture.begin(.region)
         case .captureWindow: capture.begin(.window)

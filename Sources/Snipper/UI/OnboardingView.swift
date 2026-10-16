@@ -45,6 +45,16 @@ struct OnboardingView: View {
 
                 step(
                     number: 3,
+                    title: "Help improve Stash (optional)",
+                    detail: "Share anonymous usage counts, such as how often you capture. Stash never sends your snips, URLs, titles or searches. Change this any time in Settings.",
+                    done: model.settings.shareUsageData
+                ) {
+                    @Bindable var settings = model.settings
+                    Toggle("Share anonymous usage data", isOn: $settings.shareUsageData)
+                }
+
+                step(
+                    number: 4,
                     title: "Choose how search works",
                     detail: "EmbeddingGemma 2 understands text and images in 100+ languages and runs fully on-device with WebGPU (one-time ≈300 MB download). Apple's built-in model is text-only but needs no download.",
                     done: false

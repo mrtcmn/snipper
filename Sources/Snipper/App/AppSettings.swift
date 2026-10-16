@@ -55,6 +55,13 @@ final class AppSettings {
     var serverPort: Int { didSet { defaults.set(serverPort, forKey: Keys.serverPort) } }
     var showInDock: Bool { didSet { defaults.set(showInDock, forKey: Keys.showInDock) } }
     var didOnboard: Bool { didSet { defaults.set(didOnboard, forKey: Keys.didOnboard) } }
+    /// Opt-in: anonymous usage events (see Analytics). Off until the user turns it on.
+    var shareUsageData: Bool {
+        didSet {
+            defaults.set(shareUsageData, forKey: Keys.shareUsageData)
+            if !shareUsageData { Analytics.forgetID() }
+        }
+    }
     var hotKeyData: Data? { didSet { defaults.set(hotKeyData, forKey: Keys.hotKeys) } }
 
     init(defaults: UserDefaults = .standard) {
@@ -71,6 +78,7 @@ final class AppSettings {
             Keys.serverPort: 47615,
             Keys.showInDock: true,
             Keys.didOnboard: false,
+            Keys.shareUsageData: false,
         ])
         searchEngine = SearchEngineChoice(rawValue: defaults.string(forKey: Keys.searchEngine) ?? "") ?? .gemma
         indexPostImages = defaults.bool(forKey: Keys.indexPostImages)
@@ -84,6 +92,7 @@ final class AppSettings {
         serverPort = (1024...65535).contains(port) ? port : 47615
         showInDock = defaults.bool(forKey: Keys.showInDock)
         didOnboard = defaults.bool(forKey: Keys.didOnboard)
+        shareUsageData = defaults.bool(forKey: Keys.shareUsageData)
         hotKeyData = defaults.data(forKey: Keys.hotKeys)
     }
 
@@ -99,6 +108,7 @@ final class AppSettings {
         static let serverPort = "serverPort"
         static let showInDock = "showInDock"
         static let didOnboard = "didOnboard"
+        static let shareUsageData = "shareUsageData"
         static let hotKeys = "hotKeys"
     }
 }

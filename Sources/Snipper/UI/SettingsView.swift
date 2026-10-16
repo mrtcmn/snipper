@@ -46,6 +46,12 @@ private struct GeneralSettings: View {
                 }
             }
             Section {
+                Toggle("Share anonymous usage data", isOn: $settings.shareUsageData)
+                Text("Stash sends only event names and counts, such as “app opened” or “screenshot saved”. It never sends your snips, URLs, titles or searches.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Section {
                 Button("Show Welcome Guide") {
                     model.showLibrary()
                     model.showOnboarding = true

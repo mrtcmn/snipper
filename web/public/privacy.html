@@ -21,10 +21,10 @@
 <body>
 <main>
   <h1>Stash Privacy Policy</h1>
-  <p class="muted">Effective October 15, 2026. Applies to the Stash Mac app and the "Stash — Save to Mac" browser extension.</p>
+  <p class="muted">Effective October 17, 2026. Applies to the Stash Mac app and the "Stash — Save to Mac" browser extension.</p>
 
   <h2>Summary</h2>
-  <p>Stash keeps everything you save on your own Mac. We do not run a server that receives your data, we do not have accounts, and we do not use analytics, ads or tracking. We never sell or share your data.</p>
+  <p>Stash keeps everything you save on your own Mac. We do not run a server that receives your data, we do not have accounts, and we do not use ads or tracking. Anonymous usage statistics are off unless you turn them on. We never sell or share your data.</p>
 
   <h2>What the extension handles</h2>
   <p>The extension acts only when you use it: when you click its button, press its shortcut, choose a right-click menu item, click the "Save to Stash" button on a post, bookmark a post on X, or start a bookmarks import. It then reads:</p>
@@ -45,6 +45,15 @@
     <li>It downloads images and link previews for items you saved, directly from the websites they come from.</li>
   </ul>
   <p>Those websites receive the normal information of any web request, such as your IP address. Their own privacy policies apply.</p>
+
+  <h2>Anonymous usage statistics (optional)</h2>
+  <p>This is off by default. If you turn on "Share anonymous usage data" in the welcome guide or in Settings, the app sends usage events to PostHog (EU Cloud, servers in the EU), which we use to see how many people use Stash and which features they use.</p>
+  <ul>
+    <li>Each event contains only an event name (for example "app opened", "action used" or "snips added"), counts, the type of item or action (for example "screenshot" or "capture region"), the app version and the macOS version.</li>
+    <li>Events never contain your saved content, page addresses, titles, notes, search queries or file names.</li>
+    <li>Events carry a random ID created on your Mac. It is not linked to your name, email, Mac or any account. We have turned off location lookup and set PostHog to discard IP addresses.</li>
+  </ul>
+  <p>Turn the setting off at any time to stop the events. Turning it off also deletes the random ID from your Mac. The browser extension never sends usage statistics.</p>
 
   <h2>Your control</h2>
   <p>You can delete any item in the app. To remove everything, quit Stash and delete the folder above. Removing the extension deletes its local storage.</p>

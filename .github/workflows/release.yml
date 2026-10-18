@@ -6,6 +6,7 @@ name: Release
 #   MACOS_CERT_P12        base64 of a "Developer ID Application" .p12
 #   MACOS_CERT_PASSWORD   password of that .p12
 #   APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD   for notarization (app-specific password)
+#   SPARKLE_PRIVATE_KEY   EdDSA key from `generate_keys -x`; signs appcast.xml for Sparkle updates
 
 on:
   push:
@@ -23,6 +24,7 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -43,7 +45,7 @@ jobs:
           echo "SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
 
       - name: Build
-        run: VERSION="${GITHUB_REF_NAME#v}" scripts/build-app.sh
+        run: VERSION="${GITHUB_REF_NAME#v}" BUILD_NUMBER="${{ github.run_number }}" scripts/build-app.sh
 
       - name: Notarize
         if: env.MACOS_CERT_P12 != '' && env.APPLE_ID != ''
@@ -58,9 +60,25 @@ jobs:
           ditto -c -k --keepParent build/Stash.app build/Stash.zip
           make extension-zip
 
+      # Installed apps read releases/latest/download/appcast.xml, so each release carries
+      # an appcast with only its own zip. Sparkle needs only the newest item.
+      - name: Make appcast
+        if: env.SPARKLE_PRIVATE_KEY != ''
+        run: |
+          mkdir -p build/updates
+          cp build/Stash.zip build/updates/
+          echo "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle_key"
+          .build/artifacts/sparkle/Sparkle/bin/generate_appcast build/updates \
+            --ed-key-file "$RUNNER_TEMP/sparkle_key" \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/$GITHUB_REF_NAME/" \
+            --link "https://stash.grasco.dev"
+          rm "$RUNNER_TEMP/sparkle_key"
+          cp build/updates/appcast.xml build/appcast.xml
+
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" build/Stash.zip Extension/stash-extension.zip \
+            $( [ -f build/appcast.xml ] && echo build/appcast.xml ) \
             --title "Stash $GITHUB_REF_NAME" --generate-notes

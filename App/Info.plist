@@ -30,6 +30,12 @@
 	<true/>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/mrtcmn/snipper/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>BrUrAafGRAMdXrZqSl7LsLndKWApUy3IZBZ8OQiWGpU=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Stash reads the address of your browser's current tab when you press “Snip browser tab”.</string>
 	<key>CFBundleURLTypes</key>

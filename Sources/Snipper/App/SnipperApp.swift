@@ -1,5 +1,6 @@
 import AppKit
 import SnipperCore
+import Sparkle
 import SwiftUI
 
 @main
@@ -14,13 +15,16 @@ struct SnipperApp: App {
                 .environment(AppModel.shared)
         }
         .commands {
-            SnipperCommands(model: AppModel.shared)
+            SnipperCommands(model: AppModel.shared, updater: appDelegate.updater.updater)
         }
     }
 }
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    // Reads SUFeedURL and SUPublicEDKey from Info.plist and checks for updates once a day.
+    let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         Task { await AppModel.shared.start() }
     }
@@ -56,8 +60,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 struct SnipperCommands: Commands {
     let model: AppModel
+    let updater: SPUUpdater
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") { updater.checkForUpdates() }
+        }
+
         CommandGroup(replacing: .newItem) {
             Button("New Note") { model.newNote() }
                 .keyboardShortcut("n")

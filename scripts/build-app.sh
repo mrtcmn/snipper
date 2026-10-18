@@ -5,6 +5,7 @@
 #   CONFIG=debug scripts/build-app.sh     # debug build
 #   SIGN_IDENTITY="Apple Development: …" scripts/build-app.sh
 #   VERSION=1.2.0 scripts/build-app.sh    # stamps CFBundleShortVersionString
+#   BUILD_NUMBER=42 scripts/build-app.sh  # stamps CFBundleVersion (Sparkle compares this one)
 #
 # Ad-hoc signing works, but macOS then asks for Screen Recording permission again after
 # every rebuild. Sign with a real identity (any Apple Development certificate) to keep it.
@@ -21,11 +22,18 @@ BIN_DIR="$(swift build -c "$CONFIG" --show-bin-path)"
 
 echo "▸ Assembling $APP"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 cp "$BIN_DIR/Snipper" "$APP/Contents/MacOS/Snipper"
+cp -R "$BIN_DIR/Sparkle.framework" "$APP/Contents/Frameworks/"
+# ponytail: the XPC services are only for sandboxed apps; Stash is not sandboxed.
+rm -rf "$APP/Contents/Frameworks/Sparkle.framework/"{XPCServices,Versions/B/XPCServices}
+install_name_tool -add_rpath @executable_path/../Frameworks "$APP/Contents/MacOS/Snipper"
 cp App/Info.plist "$APP/Contents/Info.plist"
 if [ -n "${VERSION:-}" ]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
+fi
+if [ -n "${BUILD_NUMBER:-}" ]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP/Contents/Info.plist"
 fi
 cp -R Sources/Snipper/Resources/. "$APP/Contents/Resources/"
 # Ship the browser extension inside the app so "Show Extension Folder" works.
@@ -43,10 +51,16 @@ if [ -f App/AppIcon.png ]; then
 fi
 
 echo "▸ Signing ($SIGN_IDENTITY)"
-# Notarization needs a secure timestamp; ad-hoc signatures cannot have one.
-TIMESTAMP="--timestamp=none"
-[ "$SIGN_IDENTITY" != "-" ] && TIMESTAMP="--timestamp"
-codesign --force --options runtime "$TIMESTAMP" \
+# Notarization needs a secure timestamp and the hardened runtime. Ad-hoc signatures cannot
+# have a timestamp, and the hardened runtime then refuses Sparkle (no shared Team ID).
+SIGN_FLAGS=(--timestamp=none)
+[ "$SIGN_IDENTITY" != "-" ] && SIGN_FLAGS=(--timestamp --options runtime)
+# Sign the nested code first, inside out. --deep is not reliable.
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+for code in "$SPARKLE/Versions/B/Autoupdate" "$SPARKLE/Versions/B/Updater.app" "$SPARKLE"; do
+  codesign --force "${SIGN_FLAGS[@]}" --sign "$SIGN_IDENTITY" "$code"
+done
+codesign --force "${SIGN_FLAGS[@]}" \
   --entitlements App/Snipper.entitlements \
   --sign "$SIGN_IDENTITY" "$APP"
 

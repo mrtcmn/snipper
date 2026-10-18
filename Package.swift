@@ -8,6 +8,8 @@ var products: [Product] = [
     .library(name: "SnipperCore", targets: ["SnipperCore"]),
 ]
 
+var dependencies: [Package.Dependency] = []
+
 var targets: [Target] = [
     // Only used on Linux, where the SQLite3 module is not part of the SDK.
     .systemLibrary(
@@ -29,10 +31,11 @@ var targets: [Target] = [
 
 #if os(macOS)
 products.append(.executable(name: "Snipper", targets: ["Snipper"]))
+dependencies.append(.package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0"))
 targets.append(
     .executableTarget(
         name: "Snipper",
-        dependencies: ["SnipperCore"],
+        dependencies: ["SnipperCore", .product(name: "Sparkle", package: "Sparkle")],
         // Copied into Snipper.app/Contents/Resources by scripts/build-app.sh.
         exclude: ["Resources"]
     )
@@ -43,6 +46,7 @@ let package = Package(
     name: "Snipper",
     platforms: [.macOS("26.0")],
     products: products,
+    dependencies: dependencies,
     targets: targets,
     swiftLanguageModes: [.v5]
 )

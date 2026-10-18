@@ -1,6 +1,6 @@
 name: Release
 
-# Push a tag like v1.2.0 to publish a GitHub release with Stash.zip and the extension zip.
+# Push a tag like v1.2.0 to publish a GitHub release with Stash.dmg, Stash.zip and the extension zip.
 #
 # Optional secrets. Without them the app is ad-hoc signed and Gatekeeper blocks the first launch.
 #   MACOS_CERT_P12        base64 of a "Developer ID Application" .p12
@@ -47,12 +47,24 @@ jobs:
       - name: Build
         run: VERSION="${GITHUB_REF_NAME#v}" BUILD_NUMBER="${{ github.run_number }}" scripts/build-app.sh
 
+      # The DMG holds the app and an Applications link, so users can drag to install.
+      - name: Make DMG
+        run: |
+          mkdir build/dmg
+          cp -R build/Stash.app build/dmg/
+          ln -s /Applications build/dmg/Applications
+          hdiutil create -volname Stash -srcfolder build/dmg -format UDZO build/Stash.dmg
+          if [ -n "${SIGN_IDENTITY:-}" ]; then
+            codesign --sign "$SIGN_IDENTITY" --timestamp build/Stash.dmg
+          fi
+
+      # Notarizing the DMG also notarizes the app inside it, so one submission covers both.
       - name: Notarize
         if: env.MACOS_CERT_P12 != '' && env.APPLE_ID != ''
         run: |
-          ditto -c -k --keepParent build/Stash.app build/notarize.zip
-          xcrun notarytool submit build/notarize.zip --wait \
+          xcrun notarytool submit build/Stash.dmg --wait \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+          xcrun stapler staple build/Stash.dmg
           xcrun stapler staple build/Stash.app
 
       - name: Package
@@ -79,6 +91,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" build/Stash.zip Extension/stash-extension.zip \
+          gh release create "$GITHUB_REF_NAME" build/Stash.dmg build/Stash.zip Extension/stash-extension.zip \
             $( [ -f build/appcast.xml ] && echo build/appcast.xml ) \
             --title "Stash $GITHUB_REF_NAME" --generate-notes

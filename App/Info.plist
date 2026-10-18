@@ -36,6 +36,10 @@
 	<string>BrUrAafGRAMdXrZqSl7LsLndKWApUy3IZBZ8OQiWGpU=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>3600</integer>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Stash reads the address of your browser's current tab when you press “Snip browser tab”.</string>
 	<key>CFBundleURLTypes</key>

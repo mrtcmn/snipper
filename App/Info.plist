@@ -31,7 +31,7 @@
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>https://github.com/mrtcmn/snipper/releases/latest/download/appcast.xml</string>
+	<string>https://github.com/mrtcmn/stash/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>BrUrAafGRAMdXrZqSl7LsLndKWApUy3IZBZ8OQiWGpU=</string>
 	<key>SUEnableAutomaticChecks</key>

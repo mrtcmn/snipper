@@ -43,8 +43,10 @@ const SOURCES: { name: string; icon: React.ReactNode }[] = [
   },
 ]
 
-const DOWNLOAD = 'https://github.com/mrtcmn/snipper/releases'
-const SOURCE = 'https://github.com/mrtcmn/snipper'
+// Always the newest notarized DMG; the release workflow uploads it with this name.
+const DOWNLOAD = 'https://github.com/mrtcmn/stash/releases/latest/download/Stash.dmg'
+const CHANGELOG = 'https://github.com/mrtcmn/stash/releases'
+const SOURCE = 'https://github.com/mrtcmn/stash'
 
 function Landing() {
   const [open, setOpen] = useState(false)
@@ -99,7 +101,7 @@ function Landing() {
             <a href="#how">How it works</a>
             <a href="/privacy.html">Privacy</a>
             <a href="#pricing">Pricing</a>
-            <a href={SOURCE}>Changelog</a>
+            <a href={CHANGELOG}>Changelog</a>
           </nav>
           <a href={DOWNLOAD} className={`inline-flex h-9 items-center gap-2 rounded-full px-4 ${onSky ? 'bg-white text-[#0A0A0A]' : 'bg-[#0A0A0A] text-white'}`}>
             <AppleIcon className="h-4 w-4 -mt-0.5" />
@@ -329,7 +331,7 @@ function Landing() {
               </div>
               <p className="max-w-[260px] text-[14px] leading-[1.6] text-[#71717A]">A quiet library for everything worth keeping.</p>
             </div>
-            <FooterCol t="Product" l={[['Features', '#product'], ['Pricing', '#pricing'], ['Changelog', SOURCE]]} />
+            <FooterCol t="Product" l={[['Features', '#product'], ['Pricing', '#pricing'], ['Changelog', CHANGELOG]]} />
             <FooterCol t="Company" l={[['Privacy', '/privacy.html'], ['Source', SOURCE]]} />
             <FooterCol t="Follow" l={[['GitHub', SOURCE]]} />
           </div>

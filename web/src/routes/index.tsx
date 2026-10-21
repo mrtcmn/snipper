@@ -332,7 +332,7 @@ function Landing() {
               <p className="max-w-[260px] text-[14px] leading-[1.6] text-[#71717A]">A quiet library for everything worth keeping.</p>
             </div>
             <FooterCol t="Product" l={[['Features', '#product'], ['Pricing', '#pricing'], ['Changelog', CHANGELOG]]} />
-            <FooterCol t="Company" l={[['Privacy', '/privacy.html'], ['Source', SOURCE]]} />
+            <FooterCol t="Company" l={[['Privacy', '/privacy.html'], ['Terms', '/terms.html'], ['Source', SOURCE]]} />
             <FooterCol t="Follow" l={[['GitHub', SOURCE]]} />
           </div>
           <div className="flex items-center justify-between border-t border-[#E8E8E5] px-10 py-5">
